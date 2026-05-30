@@ -1,0 +1,26 @@
+# Environment and secrets
+.env
+.env.*
+*.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Credentials
+*.pem
+*.key
+*.p12
+credentials.json
+service-account.json
+
+# Build artifacts
+node_modules/
+dist/
