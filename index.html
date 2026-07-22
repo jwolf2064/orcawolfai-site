@@ -3,93 +3,523 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orca Wolf AI</title>
+    <title>OrcaWolf AI | Enterprise Sovereign Mesh & Healthcare AI Infrastructure</title>
+    <meta name="description" content="OrcaWolf AI provides next-generation Sovereign Data Mesh architecture, AWS Bedrock enterprise solutions, and Gemini Healthcare EHR, CDS, and Analytics AI models.">
+    <meta name="keywords" content="OrcaWolf AI, Sovereign Mesh, Healthcare AI, AWS Bedrock, Gemini Healthcare, EHR AI, Clinical Decision Support, CDS, Healthcare Analytics, FHIR, HIPAA">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <!-- Navigation Section -->
-    <nav class="navbar">
+<body class="dark-theme">
+    <!-- Ambient Background Lighting -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+
+    <!-- Header & Navigation -->
+    <header class="navbar-header" id="navbar">
         <div class="navbar-container">
-            <!-- Logo Section - YOUR LOGO HERE -->
-            <div class="logo-section">
-                <img src="assets/OrcaWolfAI.jpg" alt="Orca Wolf AI Logo" class="logo">
-                <span class="brand-name">Orca Wolf AI</span>
-            </div>
-        <div class="space-x-8 text-sm font-medium uppercase tracking-widest">
-            <a href="#mission" class="hover:text-blue-400 transition">Mission</a>
-            <a href="papers/sovereign-mesh.html" class="hover:text-blue-400 transition underline decoration-blue-500 decoration-2 underline-offset-8">White Papers</a>
-            <a href="#contact" class="hover:text-blue-400 transition">Contact</a>    
-        </div>
-            <!-- Menu Items -->
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="#home" class="nav-link">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#about" class="nav-link">About</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#services" class="nav-link">Services</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#contact" class="nav-link">Contact</a>
-                </li>
-            </ul>
+            <a href="#hero" class="brand-logo">
+                <div class="logo-icon-wrapper">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 2L28 9V23L16 30L4 23V9L16 2Z" stroke="url(#logo-grad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="16" cy="16" r="4" fill="url(#logo-grad)"/>
+                        <path d="M16 6V12M16 20V26M6 11L12 14.5M20 17.5L26 21M6 21L12 17.5M20 14.5L26 11" stroke="url(#logo-grad)" stroke-width="1.5" stroke-opacity="0.7"/>
+                        <defs>
+                            <linearGradient id="logo-grad" x1="4" y1="2" x2="28" y2="30" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#00F5D4"/>
+                                <stop offset="0.5" stop-color="#00B4D8"/>
+                                <stop offset="1" stop-color="#7209B7"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-title">OrcaWolf <span class="accent-text">AI</span></span>
+                    <span class="brand-sub">Sovereign Mesh & Healthcare AI</span>
+                </div>
+            </a>
 
-            <!-- Hamburger Menu for Mobile -->
-            <div class="hamburger">
+            <nav class="nav-links" id="nav-links">
+                <a href="#sovereign-mesh" class="nav-item">Sovereign Mesh</a>
+                <a href="#aws-bedrock" class="nav-item">AWS Bedrock</a>
+                <a href="#gemini-engine" class="nav-item">Gemini Healthcare</a>
+                <a href="#architecture" class="nav-item">Architecture</a>
+                <a href="#whitepapers" class="nav-item">White Papers</a>
+                <a href="#contact" class="nav-item nav-btn">Contact Us</a>
+            </nav>
+
+            <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle navigation">
                 <span></span>
                 <span></span>
                 <span></span>
-            </div>
+            </button>
         </div>
-    </nav>
+    </header>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="hero-content">
-            <h1>Welcome to Orca Wolf AI</h1>
-            <p>Innovative AI Solutions for Your Business</p>
-            <button class="cta-button">Get Started</button>
-        </div>
-    </section>
+    <!-- Main Content Container -->
+    <main>
+        <!-- Hero Section -->
+        <section id="hero" class="hero-section">
+            <div class="hero-container">
+                <div class="hero-badge">
+                    <span class="badge-pulse"></span>
+                    <span class="badge-text">Next-Gen Sovereign Healthcare Intelligence</span>
+                </div>
+                
+                <h1 class="hero-title">
+                    Unified AI Infrastructure for <br>
+                    <span class="gradient-text">Modern Health Enterprise</span>
+                </h1>
+                
+                <p class="hero-description">
+                    Combining <strong>AWS Bedrock Enterprise Security</strong> with <strong>Gemini Healthcare EHR, CDS, and Analytics Models</strong> over a Zero-Trust Sovereign Data Mesh.
+                </p>
 
-    <!-- About Section -->
-    <section id="about" class="about">
-        <h2>About Us</h2>
-        <p>We provide cutting-edge AI solutions tailored to your business needs.</p>
-    </section>
+                <div class="hero-actions">
+                    <a href="#architecture" class="btn btn-primary">
+                        <span>Explore Architecture</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                    <a href="#whitepapers" class="btn btn-secondary">
+                        <span>White Papers</span>
+                    </a>
+                </div>
 
-    <!-- Services Section -->
-    <section id="services" class="services">
-        <h2>Our Services</h2>
-        <div class="services-grid">
-            <div class="service-card">
-                <h3>Service 1</h3>
-                <p>Description of service 1</p>
+                <!-- Metrics Grid -->
+                <div class="hero-metrics">
+                    <div class="metric-card">
+                        <span class="metric-value">Zero-Trust</span>
+                        <span class="metric-label">Sovereign Data Mesh</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-value">FHIR R4 & HIPAA</span>
+                        <span class="metric-label">Compliant Interoperability</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-value">AWS Bedrock</span>
+                        <span class="metric-label">Enterprise Multi-Model VPC</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-value">Gemini Engine</span>
+                        <span class="metric-label">EHR, CDS & Analytics</span>
+                    </div>
+                </div>
             </div>
-            <div class="service-card">
-                <h3>Service 2</h3>
-                <p>Description of service 2</p>
-            </div>
-            <div class="service-card">
-                <h3>Service 3</h3>
-                <p>Description of service 3</p>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Contact Section -->
-    <section id="contact" class="contact">
-        <h2>Get In Touch</h2>
-        <p>Contact us for more information about our services.</p>
-    </section>
+        <!-- Sovereign Mesh Section -->
+        <section id="sovereign-mesh" class="content-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-tag">Decentralized Data Architecture</span>
+                    <h2 class="section-title">AI EHR Sovereign Mesh</h2>
+                    <p class="section-subtitle">
+                        Enable collaborative medical intelligence and federated learning across health systems without centralizing sensitive Patient Health Information (PHI).
+                    </p>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="glass-card feature-card">
+                        <div class="card-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </div>
+                        <h3>Zero-Trust Data Sovereignty</h3>
+                        <p>Patient data remains strictly inside the covered entity's cryptographic perimeter. Models travel to the data, preserving 100% data residency and privacy compliance.</p>
+                    </div>
+
+                    <div class="glass-card feature-card">
+                        <div class="card-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                        </div>
+                        <h3>FHIR R4 & HL7 Interoperability</h3>
+                        <p>Seamless real-time data translation between legacy hospital EHRs (Epic, Cerner, MEDITECH) and standardized FHIR resources for automated model consumption.</p>
+                    </div>
+
+                    <div class="glass-card feature-card">
+                        <div class="card-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 17 22 12"/></svg>
+                        </div>
+                        <h3>Cryptographic Audit Provenance</h3>
+                        <p>Every data query, model inference, and clinical alert recommendation is immutably logged with cryptographic signatures to guarantee complete auditability.</p>
+                    </div>
+
+                    <div class="glass-card feature-card">
+                        <div class="card-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                        </div>
+                        <h3>Federated Insights Synchronization</h3>
+                        <p>Train state-of-the-art predictive algorithms over multi-institutional datasets without ever sharing underlying patient medical records.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AWS Bedrock Section -->
+        <section id="aws-bedrock" class="content-section alt-bg">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-tag">Enterprise AI Orchestration</span>
+                    <h2 class="section-title">AWS Bedrock Enterprise Solutions</h2>
+                    <p class="section-subtitle">
+                        Scalable, secure, and multi-model foundation model deployment wrapped in strict VPC isolation and automated governance.
+                    </p>
+                </div>
+
+                <div class="architecture-pillars">
+                    <div class="glass-card pillar-card">
+                        <div class="pillar-number">01</div>
+                        <h3>Private VPC Endpoint Isolation</h3>
+                        <p>Deploy AI workflows inside isolated AWS Virtual Private Clouds with AWS PrivateLink. Your clinical data never crosses the public internet or trains public baseline models.</p>
+                    </div>
+
+                    <div class="glass-card pillar-card">
+                        <div class="pillar-number">02</div>
+                        <h3>Enterprise RAG & Knowledge Bases</h3>
+                        <p>Connect clinical practice guidelines, institutional protocols, and PubMed medical literature directly to Bedrock Knowledge Bases with vector retrieval (OpenSearch Serverless).</p>
+                    </div>
+
+                    <div class="glass-card pillar-card">
+                        <div class="pillar-number">03</div>
+                        <h3>Guardrails for Healthcare AI</h3>
+                        <p>Enforce strict hallucination detection, PII/PHI redaction, and toxicity filters to ensure AI output adheres to medical safety standards and clinical governance.</p>
+                    </div>
+
+                    <div class="glass-card pillar-card">
+                        <div class="pillar-number">04</div>
+                        <h3>Multi-Model Clinical Agents</h3>
+                        <p>Orchestrate complex healthcare workflows using AWS Bedrock Agents—automating prior authorizations, discharge summaries, and medical coding seamlessly.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gemini Healthcare Engine Section -->
+        <section id="gemini-engine" class="content-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-tag">Specialized Medical Intelligence</span>
+                    <h2 class="section-title">Gemini Healthcare Models</h2>
+                    <p class="section-subtitle">
+                        Purpose-built clinical models tailored for EHR understanding, real-time clinical decision support, and advanced healthcare analytics.
+                    </p>
+                </div>
+
+                <div class="gemini-grid">
+                    <!-- Model 1: EHR Intelligence -->
+                    <div class="glass-card gemini-card">
+                        <div class="gemini-badge">EHR Intelligence</div>
+                        <h3>Gemini Clinical EHR Model</h3>
+                        <p>Deep parsing of unstructured physician notes, lab results, pathology reports, and imaging summaries. Automatically converts unstructured clinical narrative into structured FHIR records.</p>
+                        <ul class="feature-list">
+                            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00F5D4" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Automated Clinical Note Summarization</li>
+                            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00F5D4" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> ICD-10 & SNOMED CT Auto-Coding</li>
+                            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00F5D4" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Longitudinal Patient Timeline Synthesis</li>
+                        </ul>
+                    </div>
+
+                    <!-- Model 2: CDS -->
+                    <div class="glass-card gemini-card highlight">
+                        <div class="gemini-badge highlight-badge">Real-Time CDS</div>
+                        <h3>Clinical Decision Support (CDS)</h3>
+                        <p>Delivers evidence-based recommendations at the point of care. Analyzes real-time patient Vitals and EHR trends to alert clinicians to early warning signs of deterioration.</p>
+                        <ul class="feature-list">
+                            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00F5D4" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Sepsis & Decompensation Early Warnings</li>
+                            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00F5D4" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Drug-Drug & Contraindication Prevention</li>
+                            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00F5D4" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Evidence-Based Treatment Protocol Matching</li>
+                        </ul>
+                    </div>
+
+                    <!-- Model 3: Analytics -->
+                    <div class="glass-card gemini-card">
+                        <div class="gemini-badge">Predictive Analytics</div>
+                        <h3>Healthcare Analytics Model</h3>
+                        <p>Advanced predictive engine for health system administrators and clinical teams. Forecasts operational bottlenecks, patient length of stay, and readmission risks.</p>
+                        <ul class="feature-list">
+                            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00F5D4" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> 30-Day Readmission Risk Prediction</li>
+                            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00F5D4" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Population Health Stratification</li>
+                            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00F5D4" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Resource & Bed Capacity Optimization</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Architecture Explorer -->
+        <section id="architecture" class="content-section alt-bg">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-tag">Interactive Blueprint</span>
+                    <h2 class="section-title">OrcaWolf AI System Architecture</h2>
+                    <p class="section-subtitle">
+                        Click through the core architecture components to see how Sovereign Mesh, AWS Bedrock, and Gemini Models integrate seamlessly.
+                    </p>
+                </div>
+
+                <!-- Tabs Controller -->
+                <div class="tab-controls">
+                    <button class="tab-btn active" data-tab="mesh-tab">1. Sovereign Mesh Topology</button>
+                    <button class="tab-btn" data-tab="bedrock-tab">2. AWS Bedrock Pipeline</button>
+                    <button class="tab-btn" data-tab="gemini-tab">3. Gemini Healthcare Engine</button>
+                    <button class="tab-btn" data-tab="security-tab">4. Security & Compliance</button>
+                </div>
+
+                <!-- Tab Display Box -->
+                <div class="glass-card tab-display">
+                    <!-- Tab 1 -->
+                    <div class="tab-content active" id="mesh-tab">
+                        <div class="tab-grid">
+                            <div class="tab-text">
+                                <h3>Decentralized Sovereign Mesh Topology</h3>
+                                <p>Health systems run sovereign mesh nodes on-premises or within their private cloud. Cryptographic tokens and zero-trust proxy agents ensure that raw patient data never leaves local boundary controls.</p>
+                                <div class="tech-stack-tags">
+                                    <span class="tag">Zero-Trust Node</span>
+                                    <span class="tag">FHIR Server</span>
+                                    <span class="tag">Mutual TLS 1.3</span>
+                                    <span class="tag">mTLS Encryption</span>
+                                </div>
+                            </div>
+                            <div class="tab-visual">
+                                <div class="visual-box">
+                                    <div class="node-network">
+                                        <div class="node central-node">OrcaWolf Mesh Control</div>
+                                        <div class="node node-1">Hospital A (Epic)</div>
+                                        <div class="node node-2">Hospital B (Cerner)</div>
+                                        <div class="node node-3">Lab Network</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2 -->
+                    <div class="tab-content" id="bedrock-tab">
+                        <div class="tab-grid">
+                            <div class="tab-text">
+                                <h3>AWS Bedrock Multi-Model Enterprise Orchestration</h3>
+                                <p>Requests from Sovereign Mesh nodes enter AWS PrivateLink VPC endpoints. AWS Bedrock orchestrates model invocation, applies safety guardrails, and queries OpenSearch Knowledge Bases without exposure to public internet.</p>
+                                <div class="tech-stack-tags">
+                                    <span class="tag">AWS Bedrock</span>
+                                    <span class="tag">AWS PrivateLink</span>
+                                    <span class="tag">Bedrock Guardrails</span>
+                                    <span class="tag">OpenSearch RAG</span>
+                                </div>
+                            </div>
+                            <div class="tab-visual">
+                                <div class="visual-box code-box">
+<pre><code><span class="code-keyword">struct</span> <span class="code-type">BedrockPipeline</span> {
+    vpc_endpoint: <span class="code-string">"vpce-orcawolf-health-bedrock"</span>,
+    guardrails: [<span class="code-string">"PHI_Redaction"</span>, <span class="code-string">"Clinical_Safety"</span>],
+    knowledge_base: <span class="code-string">"arn:aws:bedrock:us-east-1:kb-clinical"</span>,
+    model_id: <span class="code-string">"gemini-healthcare-v1"</span>
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3 -->
+                    <div class="tab-content" id="gemini-tab">
+                        <div class="tab-grid">
+                            <div class="tab-text">
+                                <h3>Gemini Healthcare EHR, CDS & Analytics Execution</h3>
+                                <p>Domain-specific Gemini Healthcare models process structured FHIR payloads to generate real-time clinical alerts, diagnostic support recommendations, and 30-day predictive risk scores.</p>
+                                <div class="tech-stack-tags">
+                                    <span class="tag">Gemini Clinical EHR</span>
+                                    <span class="tag">Real-Time CDS</span>
+                                    <span class="tag">Predictive Analytics</span>
+                                    <span class="tag">SNOMED Mapping</span>
+                                </div>
+                            </div>
+                            <div class="tab-visual">
+                                <div class="visual-box">
+                                    <div class="cds-preview">
+                                        <div class="alert-bar warning">
+                                            <span class="alert-icon">⚠️</span>
+                                            <div class="alert-info">
+                                                <strong>CDS Alert: Early Sepsis Warning (Confidence 94%)</strong>
+                                                <small>Elevated Lactate & HR spike detected in EHR Stream.</small>
+                                            </div>
+                                        </div>
+                                        <div class="alert-bar success">
+                                            <span class="alert-icon">✅</span>
+                                            <div class="alert-info">
+                                                <strong>Protocol Recommended: SEPSIS-BUNDLE-V3</strong>
+                                                <small>Stat Blood Cultures & IV Fluids calculated per body weight.</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 4 -->
+                    <div class="tab-content" id="security-tab">
+                        <div class="tab-grid">
+                            <div class="tab-text">
+                                <h3>Comprehensive Security & Compliance Matrix</h3>
+                                <p>Engineered from the ground up for strict healthcare regulations. Guaranteed HIPAA, HITECH, and SOC2 Type II compliance with execution covered under BAA (Business Associate Agreement).</p>
+                                <div class="tech-stack-tags">
+                                    <span class="tag">HIPAA Compliant</span>
+                                    <span class="tag">BAA Ready</span>
+                                    <span class="tag">AES-256 at Rest</span>
+                                    <span class="tag">TLS 1.3 in Transit</span>
+                                </div>
+                            </div>
+                            <div class="tab-visual">
+                                <div class="visual-box security-matrix">
+                                    <div class="sec-item"><span class="check">✔</span> HIPAA & HITECH Compliant Architecture</div>
+                                    <div class="sec-item"><span class="check">✔</span> End-to-End Encryption (AES-256 & TLS 1.3)</div>
+                                    <div class="sec-item"><span class="check">✔</span> Cryptographic Audit Trail for AI Decisions</div>
+                                    <div class="sec-item"><span class="check">✔</span> Zero PHI Retention on AI Model Servers</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- White Papers Section -->
+        <section id="whitepapers" class="content-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-tag">Technical Research & Publications</span>
+                    <h2 class="section-title">White Papers & Reference Models</h2>
+                    <p class="section-subtitle">
+                        Read our technical white papers detailing Sovereign Mesh cryptography, Gemini CDS accuracy benchmarks, and AWS Bedrock deployment guides.
+                    </p>
+                </div>
+
+                <div class="papers-grid">
+                    <div class="glass-card paper-card">
+                        <div class="paper-icon">📄</div>
+                        <div class="paper-type">Technical White Paper</div>
+                        <h3>AI EHR Sovereign Mesh: Zero-Trust Health Data Interoperability</h3>
+                        <p>Architectural specification for decentralized federated learning over clinical health systems without PHI aggregation.</p>
+                        <a href="#contact" class="paper-link">Request Access &rarr;</a>
+                    </div>
+
+                    <div class="glass-card paper-card">
+                        <div class="paper-icon">📊</div>
+                        <div class="paper-type">Clinical Benchmark</div>
+                        <h3>Gemini Healthcare CDS Model: Real-Time Sepsis & Decompensation Alerts</h3>
+                        <p>Validation study evaluating real-time decision support accuracy, reduced false-positive alarm fatigue, and clinical outcomes.</p>
+                        <a href="#contact" class="paper-link">Request Access &rarr;</a>
+                    </div>
+
+                    <div class="glass-card paper-card">
+                        <div class="paper-icon">🛡️</div>
+                        <div class="paper-type">Deployment Blueprint</div>
+                        <h3>AWS Bedrock Enterprise Integration for Sovereign Mesh Nodes</h3>
+                        <p>Step-by-step implementation guide for private VPC endpoint setup, OpenSearch vector index creation, and guardrail policies.</p>
+                        <a href="#contact" class="paper-link">Request Access &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="content-section alt-bg">
+            <div class="section-container">
+                <div class="contact-wrapper glass-card">
+                    <div class="contact-info">
+                        <span class="section-tag">Get In Touch</span>
+                        <h2>Partner with OrcaWolf AI</h2>
+                        <p>Ready to deploy Sovereign Mesh architecture and Gemini Healthcare models within your health system or enterprise AWS environment?</p>
+                        
+                        <div class="contact-details">
+                            <div class="detail-item">
+                                <div class="detail-icon">🌐</div>
+                                <div>
+                                    <strong>Official Domain</strong>
+                                    <span>www.orcawolfai.com</span>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-icon">🔒</div>
+                                <div>
+                                    <strong>Security & BAA Inquiries</strong>
+                                    <span>compliance@orcawolfai.com</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form class="contact-form" id="contact-form" onsubmit="event.preventDefault(); alert('Thank you for contacting OrcaWolf AI. Our team will reach out shortly.');">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" required placeholder="John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Work Email</label>
+                            <input type="email" id="email" required placeholder="john@healthsystem.org">
+                        </div>
+                        <div class="form-group">
+                            <label for="organization">Organization / Health System</label>
+                            <input type="text" id="organization" placeholder="OrcaWolf Health Systems">
+                        </div>
+                        <div class="form-group">
+                            <label for="interest">Primary Interest</label>
+                            <select id="interest">
+                                <option value="sovereign-mesh">Sovereign Data Mesh Architecture</option>
+                                <option value="aws-bedrock">AWS Bedrock Enterprise Integration</option>
+                                <option value="gemini-ehr">Gemini Healthcare EHR & CDS Models</option>
+                                <option value="white-papers">White Papers & Research Access</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message / Project Scope</label>
+                            <textarea id="message" rows="4" placeholder="Tell us about your healthcare AI or data mesh requirements..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Submit Inquiry</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <!-- Footer -->
-    <footer class="footer">
-        <p>&copy; 2026 Orca Wolf AI. All rights reserved.</p>
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <span class="brand-title">OrcaWolf <span class="accent-text">AI</span></span>
+                <p>Innovating Secure Health Data Infrastructure & Specialized Clinical AI Models.</p>
+            </div>
+            
+            <div class="footer-links">
+                <div class="link-group">
+                    <h4>Solutions</h4>
+                    <a href="#sovereign-mesh">Sovereign Data Mesh</a>
+                    <a href="#aws-bedrock">AWS Bedrock Integration</a>
+                    <a href="#gemini-engine">Gemini Healthcare Models</a>
+                </div>
+                <div class="link-group">
+                    <h4>Capabilities</h4>
+                    <a href="#gemini-engine">EHR Intelligence</a>
+                    <a href="#gemini-engine">Clinical Decision Support (CDS)</a>
+                    <a href="#gemini-engine">Healthcare Analytics</a>
+                </div>
+                <div class="link-group">
+                    <h4>Resources</h4>
+                    <a href="#architecture">Architecture Explorer</a>
+                    <a href="#whitepapers">White Papers</a>
+                    <a href="#contact">Contact & BAA</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 OrcaWolf AI, LLC. All rights reserved. HIPAA & FHIR Compliant Infrastructure.</p>
+        </div>
     </footer>
 
+    <!-- Custom JavaScript -->
     <script src="script.js"></script>
 </body>
 </html>
