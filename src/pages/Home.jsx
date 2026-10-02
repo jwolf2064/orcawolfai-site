@@ -155,6 +155,15 @@ export default function Home() {
             Sovereign EHR Mesh · Zero-Trust · Ambient Architecture
           </div>
 
+          {/* Logo */}
+          <div className="animate-fade-in-up flex justify-center mb-8">
+            <img
+              src="/static/orcawolfai-logo.png"
+              alt="OrcaWolf AI"
+              className="w-40 h-40 sm:w-52 sm:h-52 rounded-full object-cover ring-4 ring-cyan-400/30 shadow-[0_0_60px_rgba(0,229,255,0.25)] animate-float"
+            />
+          </div>
+
           <h1 className="animate-fade-in-up font-display text-5xl sm:text-6xl lg:text-8xl font-extrabold text-white leading-none tracking-tight mb-6">
             Orca<span className="text-cyan-400 glow-text-cyan">Wolf</span>{" "}
             <span className="text-wolf-300">AI</span>

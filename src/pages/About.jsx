@@ -9,6 +9,13 @@ export default function About() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
+          <div className="flex justify-center mb-8">
+            <img
+              src="/static/orcawolfai-logo.png"
+              alt="OrcaWolf AI"
+              className="w-32 h-32 sm:w-40 sm:h-40 rounded-full object-cover ring-4 ring-cyan-400/30 shadow-[0_0_48px_rgba(0,229,255,0.20)]"
+            />
+          </div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-wolf-400/30 bg-wolf-400/5 text-wolf-300 text-xs font-mono mb-6">
             <GlobeIcon className="w-3 h-3" aria-hidden="true" />
             About OrcaWolf AI

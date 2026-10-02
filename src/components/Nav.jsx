@@ -36,18 +36,14 @@ export default function Nav() {
         {/* Logo */}
         <NavLink
           to="/"
-          className="flex items-center gap-3 group"
+          className="flex items-center gap-2 group"
           aria-label="OrcaWolf AI — Home"
         >
-          {/* SVG mark */}
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-            <rect width="32" height="32" rx="6" fill="#0a1628" />
-            <path d="M6 22 Q10 8 16 10 Q22 8 26 22" stroke="#00e5ff" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-            <circle cx="11" cy="16" r="2" fill="#00e5ff" />
-            <circle cx="21" cy="16" r="2" fill="#4fc3f7" />
-            <path d="M11 16 L16 11 L21 16" stroke="#00e5ff" strokeWidth="1" fill="none" />
-            <path d="M4 24 Q16 20 28 24" stroke="#4fc3f7" strokeWidth="1" fill="none" strokeLinecap="round" opacity="0.6"/>
-          </svg>
+          <img
+            src="/static/orcawolfai-logo.png"
+            alt="OrcaWolf AI"
+            className="w-10 h-10 rounded-full object-cover ring-1 ring-cyan-400/30 group-hover:ring-cyan-400/60 transition-all duration-200"
+          />
           <span className="font-display font-800 text-lg text-white tracking-tight">
             Orca<span className="text-cyan-400">Wolf</span>{" "}
             <span className="text-wolf-300 text-sm font-normal font-mono">AI</span>
