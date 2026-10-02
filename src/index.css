@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+/* Theme customization lives in tailwind.config.js, bridged in via @config.
+   (You can also define theme tokens directly here with @theme { ... }.) */
+@config "../tailwind.config.cjs";

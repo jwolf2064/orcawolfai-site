@@ -1,0 +1,3 @@
+# Fast Refresh runtime for @vitejs/plugin-react@4 (vite6 externalises it).
+# server.js symlinks node_modules/<pkg> -> global at startup (tmpfs-safe).
+react-refresh
