@@ -1,6 +1,6 @@
 # Project Setup
 
-Last updated: <!-- update this after each change -->
+Last updated: 2026-10-02
 
 Factual state of this project, for the assistant's reference. Record project
 state here only — structure, installed packages, active patterns. Keep it brief.
@@ -101,3 +101,30 @@ works from any of them — so two rules keep links and assets from breaking:
 
   (or `<BrowserRouter basename={basename}>`). This makes the app mount
   correctly whether served from `/` or a longer prefix.
+
+## Current site state
+
+Multi-page React app with client-side routing (BrowserRouter in main.jsx).
+
+### Pages
+- `/` — Home: hero with mesh diagram, six-pillar architecture overview, CTA
+- `/architecture` — Six-layer sovereign mesh stack (L0–L5), design principles
+- `/simulation` — Mass Casualty Incident simulation engine (runs client-side, no data stored)
+- `/innovation` — Research & ideas: six innovation cards with status indicators
+- `/about` — Mission, principles, link to orcawolfai.com
+
+### Components
+- `src/components/Nav.jsx` — Fixed top nav with mobile hamburger, NavLink active states
+- `src/components/Footer.jsx` — Three-column footer with brand, page links, tech stack
+- `src/layouts/SiteLayout.jsx` — Wraps Nav + Outlet + Footer
+
+### Design
+- Dark ocean palette: #050a0f base, #070e18 cards, #0a1628 elevated surfaces
+- Cyan (#00e5ff / #22d3ee) primary accent, wolf-blue (#4fc3f7) secondary
+- Typefaces: Syne (display), Space Grotesk (body), DM Mono (mono) — loaded via vite-ignore link in index.html, declared in tailwind.config.cjs
+- Custom animations in index.css: fade-in-up, float, node-pulse, scan
+
+### Notes
+- BrowserRouter wraps app in main.jsx (not App.jsx)
+- Simulation page is fully client-side — deterministic pseudo-random engine, no backend calls
+- @radix-ui/react-slot removed — was in placeholder, not available; Button component dropped
