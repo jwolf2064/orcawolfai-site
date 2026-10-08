@@ -5,6 +5,7 @@ import ActivityIcon from "icon:activity";
 import ZapIcon from "icon:zap";
 import LockIcon from "icon:lock";
 import LayersIcon from "icon:layers";
+import MailIcon from "icon:mail";
 
 const PILLARS = [
   {
@@ -192,6 +193,13 @@ export default function Home() {
               <NetworkIcon className="w-4 h-4" aria-hidden="true" />
               Explore Architecture
             </Link>
+            <Link
+              to="/contact"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded border border-white/15 text-slate-300 font-semibold text-sm hover:bg-white/5 hover:text-white transition-all duration-200"
+            >
+              <MailIcon className="w-4 h-4" aria-hidden="true" />
+              Contact Us
+            </Link>
           </div>
         </div>
 
@@ -256,13 +264,22 @@ export default function Home() {
                 Enter your own mass casualty scenario parameters and watch the AI triage,
                 resource-allocation, and outcome modeling run in real time.
               </p>
-              <Link
-                to="/simulation"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded bg-cyan-400 text-[#050a0f] font-semibold hover:bg-cyan-300 transition-all glow-cyan"
-              >
-                <ActivityIcon className="w-4 h-4" aria-hidden="true" />
-                Launch Simulation
-              </Link>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  to="/simulation"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded bg-cyan-400 text-[#050a0f] font-semibold hover:bg-cyan-300 transition-all glow-cyan"
+                >
+                  <ActivityIcon className="w-4 h-4" aria-hidden="true" />
+                  Launch Simulation
+                </Link>
+                <Link
+                  to="/contact"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded border border-cyan-400/30 text-cyan-400 font-semibold hover:bg-cyan-400/10 transition-all"
+                >
+                  <MailIcon className="w-4 h-4" aria-hidden="true" />
+                  Contact Us
+                </Link>
+              </div>
             </div>
           </div>
         </div>
