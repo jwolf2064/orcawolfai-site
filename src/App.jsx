@@ -5,6 +5,7 @@ import Architecture from "./pages/Architecture.jsx";
 import Simulation from "./pages/Simulation.jsx";
 import Innovation from "./pages/Innovation.jsx";
 import About from "./pages/About.jsx";
+import Contact from "./pages/Contact.jsx";
 import NotFound from "./pages/NotFound.jsx";
 
 export default function App() {
@@ -16,6 +17,7 @@ export default function App() {
         <Route path="/simulation" element={<Simulation />} />
         <Route path="/innovation" element={<Innovation />} />
         <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
