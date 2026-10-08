@@ -8,6 +8,7 @@ import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
+import GitHub from "./pages/GitHub.jsx";
 import NotFound from "./pages/NotFound.jsx";
 
 export default function App() {
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/innovation" element={<Innovation />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/github" element={<GitHub />} />
       </Route>
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin" element={<AdminDashboard />} />
