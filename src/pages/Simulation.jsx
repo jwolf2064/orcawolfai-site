@@ -1,4 +1,8 @@
 import { useState, useRef, useEffect } from "react";
+import CodeIcon from "icon:code-2";
+import LayersIcon from "icon:layers";
+import CpuIcon from "icon:cpu";
+import GithubIcon from "icon:github";
 import ActivityIcon from "icon:activity";
 import UserIcon from "icon:users";
 import AlertIcon from "icon:alert-triangle";
@@ -55,6 +59,158 @@ const SCENARIOS = [
   { value: "active_shooter", label: "Active Shooter Event" },
 ];
 
+const ENGINE_FILES = [
+  {
+    name: "fhir_mongo_loader.py",
+    label: "FHIR Ingestion Engine",
+    icon: "layers",
+    description: "Ingests Synthea-generated FHIR R4 bundles into the sovereign mesh data store. Routes each resource type to its own partition with upsert logic to prevent duplicates across local and cloud targets.",
+    code: `import os, json
+from pymongo import MongoClient
+
+LOCAL_MONGO_URI = "mongodb://localhost:27017/"
+ATLAS_MONGO_URI = "mongodb+srv://<user>:<pass>@<cluster>/?retryWrites=true&w=majority"
+
+client = MongoClient(LOCAL_MONGO_URI)
+db = client["fhir_v4"]
+PAYLOAD_DIR = "load-engine/sample_fhir_payloads"
+
+def process_fhir_bundle(filepath):
+    with open(filepath, "r", encoding="utf-8") as f:
+        bundle = json.load(f)
+    if bundle.get("resourceType") != "Bundle":
+        return
+    for entry in bundle.get("entry", []):
+        resource = entry.get("resource")
+        if not resource:
+            continue
+        resource_type = resource.get("resourceType")
+        if "id" in resource:
+            resource["_id"] = resource["id"]
+        db[resource_type].update_one(
+            {"_id": resource.get("_id")},
+            {"$set": resource},
+            upsert=True
+        )
+
+for filename in os.listdir(PAYLOAD_DIR):
+    if filename.endswith(".json"):
+        process_fhir_bundle(os.path.join(PAYLOAD_DIR, filename))`,
+  },
+  {
+    name: "fhir_vector_pipeline.py",
+    label: "Vertex AI Vector Pipeline",
+    icon: "cpu",
+    description: "Converts FHIR R4 patient bundles into semantic clinical summaries and generates 768-dimension vector embeddings via Google Vertex AI (text-embedding-004). Powers the AI triage intelligence at L4 of the Sovereign Mesh stack.",
+    code: `import os, json
+from google.cloud import aiplatform
+from vertexai.language_models import TextEmbeddingModel
+
+os.environ["GOOGLE_CLOUD_PROJECT"] = "your-gcp-project-id"
+aiplatform.init(project=os.environ["GOOGLE_CLOUD_PROJECT"], location="us-central1")
+
+def fhir_to_semantic_string(fhir_bundle_path):
+    with open(fhir_bundle_path, 'r') as f:
+        bundle = json.load(f)
+    patient_info, conditions, medications = "", [], []
+    for entry in bundle.get('entry', []):
+        resource = entry.get('resource', {})
+        rt = resource.get('resourceType')
+        if rt == 'Patient':
+            name = resource.get('name', [{}])[0]
+            given = " ".join(name.get('given', []))
+            family = name.get('family', '')
+            patient_info = f"Patient: {given} {family}, {resource.get('gender')} born {resource.get('birthDate')}."
+        elif rt == 'Condition':
+            code_text = resource.get('code', {}).get('text', '')
+            if code_text:
+                conditions.append(f"{code_text} (onset: {resource.get('onsetDateTime','unknown')})")
+        elif rt == 'MedicationRequest':
+            med = resource.get('medicationCodeableConcept', {}).get('text', '')
+            if med:
+                medications.append(f"{med} ({resource.get('status','unknown')})")
+    summary = patient_info
+    if conditions: summary += " Conditions: " + "; ".join(conditions) + "."
+    if medications: summary += " Medications: " + "; ".join(medications) + "."
+    return summary
+
+def generate_vertex_embedding(text_content):
+    model = TextEmbeddingModel.from_pretrained("text-embedding-004")
+    embeddings = model.get_embeddings([text_content])
+    return embeddings[0].values`,
+  },
+  {
+    name: "locustfile.py",
+    label: "Combat Medic Load Tester",
+    icon: "code",
+    description: "Simulates field chaos — each CombatMedicUser submits random Synthea FHIR trauma payloads to the AI Gateway every 1–5 seconds, mimicking real MASCAL conditions. Tracks success/failure rates in real time via the Locust dashboard.",
+    code: `# Author: John Wolf, MBA CIS — OrcaWolfAI (08/02/2026)
+import os, json, random
+from locust import HttpUser, task, between
+
+PAYLOAD_DIR = "sample_fhir_payloads"
+fhir_payloads = []
+
+for filename in os.listdir(PAYLOAD_DIR):
+    if filename.endswith(".json"):
+        with open(os.path.join(PAYLOAD_DIR, filename), "r", encoding="utf-8") as f:
+            fhir_payloads.append(json.load(f))
+
+class CombatMedicUser(HttpUser):
+    # 1–5 second wait simulates field chaos
+    wait_time = between(1, 5)
+
+    @task
+    def submit_casualty(self):
+        if not fhir_payloads:
+            return
+        payload = random.choice(fhir_payloads)
+        with self.client.post(
+            "/api/encounter/triage",
+            json=payload,
+            name="/api/encounter/triage",
+            catch_response=True
+        ) as response:
+            if response.status_code == 200:
+                response.success()
+            else:
+                response.failure(f"AI Gateway returned: {response.status_code}")`,
+  },
+];
+
+function CodeBlock({ file, isOpen, onToggle }) {
+  return (
+    <div className="rounded-2xl border border-cyan-400/15 bg-[#070e18] overflow-hidden">
+      <button
+        onClick={onToggle}
+        className="w-full flex items-center justify-between p-5 text-left hover:bg-[#0a1628] transition-colors"
+        aria-expanded={isOpen}
+      >
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-lg bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center shrink-0">
+            <CodeIcon className="w-5 h-5 text-cyan-400" aria-hidden="true" />
+          </div>
+          <div>
+            <p className="text-white font-semibold font-mono text-sm">{file.name}</p>
+            <p className="text-cyan-400 text-xs mt-0.5">{file.label}</p>
+          </div>
+        </div>
+        <span className="text-slate-400 text-xs font-mono">{isOpen ? "▲ collapse" : "▼ expand"}</span>
+      </button>
+      {isOpen && (
+        <div className="border-t border-cyan-400/10">
+          <div className="px-5 py-4 border-b border-cyan-400/10">
+            <p className="text-slate-300 text-sm leading-relaxed">{file.description}</p>
+          </div>
+          <pre className="p-5 overflow-x-auto text-xs font-mono text-slate-300 leading-relaxed bg-[#030609]">
+            <code>{file.code}</code>
+          </pre>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Simulation() {
   const [casualties, setCasualties] = useState("");
   const [resources, setResources] = useState("");
@@ -64,6 +220,7 @@ export default function Simulation() {
   const [running, setRunning] = useState(false);
   const [logIdx, setLogIdx] = useState(0);
   const [errors, setErrors] = useState({});
+  const [openFile, setOpenFile] = useState(null);
   const logRef = useRef(null);
 
   useEffect(() => {
@@ -371,6 +528,75 @@ export default function Simulation() {
             </button>
           </div>
         )}
+      </div>
+
+      {/* Production Engine Section */}
+      <div className="max-w-4xl mx-auto px-4 pb-24">
+        <div className="border-t border-cyan-400/10 pt-16">
+          <div className="flex items-center gap-4 mb-3">
+            <div className="w-10 h-10 rounded-lg bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center">
+              <LayersIcon className="w-5 h-5 text-cyan-400" aria-hidden="true" />
+            </div>
+            <div>
+              <h2 className="text-white font-display font-bold text-2xl">Production Engine</h2>
+              <p className="text-cyan-400 text-sm font-mono">orcawolf-edge-triage-sim</p>
+            </div>
+          </div>
+          <p className="text-slate-300 text-sm leading-relaxed mb-2">
+            The interactive simulator above runs entirely in your browser. Behind it sits a production-grade
+            combat triage engine — built by John Wolf, OrcaWolfAI — that ingests real FHIR R4 patient bundles,
+            runs them through a Google Vertex AI vector embedding pipeline, and load-tests the AI gateway
+            under field chaos conditions simulating real MASCAL events.
+          </p>
+          <a
+            href="https://github.com/jwolf2064/orcawolf-edge-triage-sim"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-cyan-400 text-sm font-mono hover:text-white transition-colors mb-10"
+          >
+            <GithubIcon className="w-4 h-4" aria-hidden="true" />
+            github.com/jwolf2064/orcawolf-edge-triage-sim
+          </a>
+
+          {/* Architecture flow */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+            {[
+              { step: "01", label: "Synthea FHIR R4", desc: "Realistic synthetic patient bundles generated at scale — trauma, blast, chemical exposure profiles" },
+              { step: "02", label: "Vertex AI Embeddings", desc: "Clinical narratives vectorised via text-embedding-004 — semantic similarity powers AI triage ranking" },
+              { step: "03", label: "MASCAL Load Test", desc: "CombatMedicUser agents hammer the AI gateway at 1–5s intervals — real field chaos, measured in real time" },
+            ].map(({ step, label, desc }) => (
+              <div key={step} className="rounded-xl border border-cyan-400/15 bg-[#070e18] p-5">
+                <p className="text-cyan-400 font-mono text-xs mb-2">{step}</p>
+                <p className="text-white font-semibold text-sm mb-2">{label}</p>
+                <p className="text-slate-400 text-xs leading-relaxed">{desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Code files */}
+          <h3 className="text-white font-semibold text-sm mb-4 font-mono uppercase tracking-wider">Source Files</h3>
+          <div className="space-y-3">
+            {ENGINE_FILES.map((file) => (
+              <CodeBlock
+                key={file.name}
+                file={file}
+                isOpen={openFile === file.name}
+                onToggle={() => setOpenFile(openFile === file.name ? null : file.name)}
+              />
+            ))}
+          </div>
+
+          <div className="mt-8 rounded-xl border border-amber-400/20 bg-amber-400/5 p-5 flex items-start gap-4">
+            <CpuIcon className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
+            <div>
+              <p className="text-amber-300 font-semibold text-sm mb-1">Connecting the Engines</p>
+              <p className="text-slate-300 text-xs leading-relaxed">
+                The next phase wires this production engine directly into the live simulation UI — real FHIR payloads,
+                live Vertex AI scoring, and a Locust dashboard embedded right here. Ready when you are.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
