@@ -6,12 +6,12 @@ import XIcon from "icon:x";
 const links = [
   { to: "/", label: "Home" },
   { to: "/architecture", label: "Architecture" },
-  { to: "/simulation", label: "MassCasualty Sim" },
+  { to: "/simulation", label: "MCI Sim" },
+  { to: "/loadtest", label: "⚡ Hammer", highlight: true },
   { to: "/innovation", label: "Innovation" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
-  { to: "/github", label: "GitHub Guide" },
-  { to: "/loadtest", label: "⚡ Hammer" },
+  { to: "/github", label: "GitHub" },
 ];
 
 export default function Nav() {
@@ -54,15 +54,19 @@ export default function Nav() {
         </NavLink>
 
         {/* Desktop links */}
-        <ul className="hidden md:flex items-center gap-1" role="list">
+        <ul className="hidden md:flex items-center gap-0.5" role="list">
           {links.map((l) => (
             <li key={l.to}>
               <NavLink
                 to={l.to}
                 end={l.to === "/"}
                 className={({ isActive }) =>
-                  `px-3 py-2 rounded text-sm font-medium transition-all duration-200 ${
-                    isActive
+                  `px-2.5 py-1.5 rounded text-xs font-medium transition-all duration-200 ${
+                    l.highlight
+                      ? isActive
+                        ? "text-red-300 bg-red-500/20 border border-red-500/40"
+                        : "text-red-400 border border-red-500/30 hover:bg-red-500/10"
+                      : isActive
                       ? "text-cyan-400 bg-cyan-400/10"
                       : "text-slate-300 hover:text-cyan-300 hover:bg-white/5"
                   }`
