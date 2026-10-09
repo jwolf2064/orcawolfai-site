@@ -629,9 +629,83 @@ export default function Simulation() {
               <RefreshIcon className="w-4 h-4" aria-hidden="true" />
               Run Another Simulation
             </button>
+
+            {/* FHIR Bundle Viewer */}
+            {fhirBundle && (
+              <div className="rounded-xl border border-emerald-400/20 bg-[#030609] overflow-hidden">
+                <button
+                  onClick={() => setShowBundle(b => !b)}
+                  className="w-full flex items-center justify-between px-5 py-4 hover:bg-emerald-400/5 transition-colors"
+                  aria-expanded={showBundle}
+                >
+                  <div className="flex items-center gap-3">
+                    <LayersIcon className="w-4 h-4 text-emerald-400" aria-hidden="true" />
+                    <span className="text-emerald-400 font-mono text-sm font-semibold">Generated FHIR R4 Bundle</span>
+                    <span className="text-slate-500 text-xs">{fhirBundle.entry.length} resources</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <a
+                      href={"data:application/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fhirBundle, null, 2))}
+                      download={"orcawolf-mci-" + scenario + "-" + Date.now() + ".json"}
+                      onClick={e => e.stopPropagation()}
+                      className="flex items-center gap-1 text-slate-400 hover:text-white text-xs font-mono transition-colors"
+                    >
+                      <DownloadIcon className="w-3 h-3" aria-hidden="true" />
+                      Download JSON
+                    </a>
+                    <ChevronIcon className={"w-4 h-4 text-slate-400 transition-transform " + (showBundle ? "rotate-180" : "")} aria-hidden="true" />
+                  </div>
+                </button>
+                {showBundle && (
+                  <pre className="px-5 pb-5 overflow-x-auto text-xs font-mono text-emerald-300/80 leading-relaxed max-h-72 overflow-y-auto">
+                    {JSON.stringify(fhirBundle, null, 2)}
+                  </pre>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
+
+      {/* Past Runs History */}
+      {pastRuns.length > 0 && (
+        <div className="max-w-4xl mx-auto px-4 mb-8">
+          <button
+            onClick={() => setShowHistory(h => !h)}
+            className="w-full flex items-center justify-between px-5 py-4 rounded-xl border border-cyan-400/15 bg-[#070e18] hover:bg-[#0a1628] transition-colors"
+            aria-expanded={showHistory}
+          >
+            <div className="flex items-center gap-3">
+              <HistoryIcon className="w-4 h-4 text-cyan-400" aria-hidden="true" />
+              <span className="text-white font-semibold text-sm">Recent Simulation Runs</span>
+              <span className="px-2 py-0.5 rounded-full bg-cyan-400/10 text-cyan-400 text-xs font-mono">{pastRuns.length}</span>
+            </div>
+            <ChevronIcon className={`w-4 h-4 text-slate-400 transition-transform ${showHistory ? "rotate-180" : ""}`} aria-hidden="true" />
+          </button>
+          {showHistory && (
+            <div className="mt-2 rounded-xl border border-cyan-400/10 bg-[#070e18] divide-y divide-cyan-400/10 overflow-hidden">
+              {pastRuns.map((run) => (
+                <div key={run.id} className="px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-white font-semibold text-sm capitalize">{(run.scenario || "").replace(/_/g, " ")}</span>
+                      {run.location && <span className="text-slate-400 text-xs">· {run.location}</span>}
+                    </div>
+                    <p className="text-slate-500 text-xs mt-0.5">{new Date(run.created).toLocaleString()}</p>
+                  </div>
+                  <div className="flex items-center gap-4 shrink-0 font-mono text-xs">
+                    <span className="text-red-400">{run.immediate ?? 0}R</span>
+                    <span className="text-amber-400">{run.delayed ?? 0}Y</span>
+                    <span className="text-emerald-400">{run.minimal ?? 0}G</span>
+                    <span className="text-slate-400">{run.expectant ?? 0}B</span>
+                    <span className="text-cyan-300">{run.casualties ?? 0} total</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Production Engine Section */}
       <div className="max-w-4xl mx-auto px-4 pb-24">
