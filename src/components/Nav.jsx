@@ -11,6 +11,7 @@ const links = [
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
   { to: "/github", label: "GitHub Guide" },
+  { to: "/loadtest", label: "⚡ Hammer" },
 ];
 
 export default function Nav() {

@@ -763,15 +763,22 @@ export default function Simulation() {
             ))}
           </div>
 
-          <div className="mt-8 rounded-xl border border-amber-400/20 bg-amber-400/5 p-5 flex items-start gap-4">
-            <CpuIcon className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
-            <div>
-              <p className="text-amber-300 font-semibold text-sm mb-1">Connecting the Engines</p>
+          <div className="mt-8 rounded-xl border border-red-500/30 bg-red-500/5 p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <CpuIcon className="w-5 h-5 text-red-400 shrink-0 mt-0.5" aria-hidden="true" />
+            <div className="flex-1">
+              <p className="text-red-300 font-semibold text-sm mb-1">Load Hammer is live</p>
               <p className="text-slate-300 text-xs leading-relaxed">
-                The next phase wires this production engine directly into the live simulation UI — real FHIR payloads,
-                live Vertex AI scoring, and a Locust dashboard embedded right here. Ready when you are.
+                Spawn up to 50 concurrent CombatMedicUser agents hammering POST /api/encounter/triage with
+                real FHIR R4 payloads — exactly as <span className="font-mono">locustfile.py</span> does in production.
+                Watch the AI gateway hold under field chaos in real time.
               </p>
             </div>
+            <a
+              href="/loadtest"
+              className="shrink-0 flex items-center gap-2 px-5 py-3 rounded-lg bg-red-500 hover:bg-red-400 text-white font-bold text-sm transition-all shadow-lg shadow-red-500/20"
+            >
+              ⚡ Launch Hammer
+            </a>
           </div>
         </div>
       </div>

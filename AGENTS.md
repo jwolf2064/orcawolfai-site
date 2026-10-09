@@ -107,6 +107,7 @@ works from any of them — so two rules keep links and assets from breaking:
 Multi-page React app with client-side routing (BrowserRouter in main.jsx).
 
 ### Pages
+- `/loadtest` — Combat Medic Load Hammer: up to 50 concurrent CombatMedicUser agents, live RPS sparkline, scenario breakdown, request log — mirrors locustfile.py
 - `/` — Home: hero with mesh diagram, six-pillar architecture overview, CTA
 - `/architecture` — Six-layer sovereign mesh stack (L0–L5), design principles
 - `/simulation` — Mass Casualty Incident simulation engine (runs client-side, no data stored)
