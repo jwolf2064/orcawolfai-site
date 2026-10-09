@@ -1,8 +1,12 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { pb } from "../lib/pb";
 import CodeIcon from "icon:code-2";
 import LayersIcon from "icon:layers";
 import CpuIcon from "icon:cpu";
-import GithubIcon from "icon:github";
+import GithubIcon from "icon:git-branch";
+import HistoryIcon from "icon:clock";
+import DownloadIcon from "icon:download";
+import ChevronIcon from "icon:chevron-down";
 import ActivityIcon from "icon:activity";
 import UserIcon from "icon:users";
 import AlertIcon from "icon:alert-triangle";
@@ -10,7 +14,65 @@ import CheckIcon from "icon:check-circle";
 import ClockIcon from "icon:clock";
 import RefreshIcon from "icon:refresh-cw";
 
-// Triage category colours (colour + pattern, never colour alone)
+// ── FHIR R4 Bundle Generator ──────────────────────────────────────────────────
+function generateFhirBundle({ casualties, scenario, location, immediate, delayed, minimal, expectant }) {
+  const now = new Date().toISOString();
+  const entries = [];
+  const scenarioConditions = {
+    blast: ["Blast injury", "Traumatic brain injury", "Penetrating wound", "Burns — 2nd degree", "Tympanic membrane rupture"],
+    chemical: ["Chemical exposure", "Respiratory failure", "Dermal burns — chemical", "Ocular injury", "Nerve agent exposure"],
+    mass_trauma: ["Crush injury", "Hemorrhagic shock", "Spinal fracture", "Traumatic amputation", "Blunt force trauma"],
+    natural: ["Crush syndrome", "Hypothermia", "Dehydration", "Fracture — multiple", "Asphyxiation"],
+    active_shooter: ["Gunshot wound — chest", "Gunshot wound — extremity", "Hemorrhagic shock", "Penetrating abdominal trauma", "Tension pneumothorax"],
+  };
+  const conditions = scenarioConditions[scenario] || scenarioConditions.mass_trauma;
+  const triageMap = [
+    ...Array(immediate).fill("R"),
+    ...Array(delayed).fill("Y"),
+    ...Array(minimal).fill("G"),
+    ...Array(expectant).fill("B"),
+  ];
+  for (let i = 0; i < Math.min(casualties, 20); i++) {
+    const cat = triageMap[i] || "G";
+    const pid = `patient-${i + 1}`;
+    entries.push({
+      resource: {
+        resourceType: "Patient",
+        id: pid,
+        meta: { profile: ["http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"] },
+        extension: [{ url: "orcawolfai-triage-category", valueCode: cat }],
+        name: [{ family: `Casualty-${String(i + 1).padStart(3, "0")}`, given: ["Unknown"] }],
+        gender: i % 2 === 0 ? "male" : "female",
+        birthDate: `${1960 + (i % 40)}-01-01`,
+      },
+      fullUrl: `urn:uuid:${pid}`,
+      request: { method: "POST", url: "Patient" },
+    });
+    entries.push({
+      resource: {
+        resourceType: "Condition",
+        id: `condition-${i + 1}`,
+        subject: { reference: `urn:uuid:${pid}` },
+        code: { text: conditions[i % conditions.length] },
+        onsetDateTime: now,
+        clinicalStatus: { coding: [{ system: "http://terminology.hl7.org/CodeSystem/condition-clinical", code: "active" }] },
+      },
+      fullUrl: `urn:uuid:condition-${i + 1}`,
+      request: { method: "POST", url: "Condition" },
+    });
+  }
+  return {
+    resourceType: "Bundle",
+    type: "transaction",
+    timestamp: now,
+    meta: {
+      tag: [{ system: "orcawolfai", code: scenario }, { system: "orcawolfai-location", code: location }],
+    },
+    entry: entries,
+  };
+}
+
+// ── Triage category colours ───────────────────────────────────────────────────
 const TRIAGE = {
   immediate: { label: "Immediate (Red)", color: "#ef4444", pattern: "●●●" },
   delayed: { label: "Delayed (Yellow)", color: "#fbbf24", pattern: "●●○" },
@@ -221,6 +283,10 @@ export default function Simulation() {
   const [logIdx, setLogIdx] = useState(0);
   const [errors, setErrors] = useState({});
   const [openFile, setOpenFile] = useState(null);
+  const [pastRuns, setPastRuns] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const [fhirBundle, setFhirBundle] = useState(null);
+  const [showBundle, setShowBundle] = useState(false);
   const logRef = useRef(null);
 
   useEffect(() => {
@@ -236,6 +302,20 @@ export default function Simulation() {
       logRef.current.scrollTop = logRef.current.scrollHeight;
     }
   }, [logIdx]);
+
+  // Load past runs from storage
+  const loadHistory = useCallback(() => {
+    const controller = new AbortController();
+    pb.collection("fhir_simulations")
+      .getList(1, 10, { sort: "-created", signal: controller.signal })
+      .then((r) => setPastRuns(r.items))
+      .catch((e) => { if (!e?.isAbort) console.error(e); });
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    return loadHistory();
+  }, [loadHistory]);
 
   function validate() {
     const errs = {};
@@ -257,10 +337,33 @@ export default function Simulation() {
     setResult(null);
     setLogIdx(0);
 
-    setTimeout(() => {
-      const sim = runSimulation({ casualties: parseInt(casualties), resources: parseInt(resources), scenario });
+    setTimeout(async () => {
+      const c = parseInt(casualties);
+      const r = parseInt(resources);
+      const sim = runSimulation({ casualties: c, resources: r, scenario });
+      const bundle = generateFhirBundle({
+        casualties: c, scenario, location,
+        immediate: sim.immediate, delayed: sim.delayed,
+        minimal: sim.minimal, expectant: sim.expectant,
+      });
+      setFhirBundle(bundle);
       setResult(sim);
       setRunning(false);
+      // Save to storage
+      try {
+        await pb.collection("fhir_simulations").create({
+          scenario, location,
+          casualties: c, resources: r,
+          immediate: sim.immediate, delayed: sim.delayed,
+          minimal: sim.minimal, expectant: sim.expectant,
+          resource_shortfall: sim.resourceShortfall,
+          estimated_minutes: sim.estimatedMinutes,
+          fhir_bundle: bundle,
+        });
+        loadHistory();
+      } catch (err) {
+        console.error("Failed to save simulation run:", err);
+      }
     }, 1200);
   }
 
