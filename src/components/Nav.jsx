@@ -9,6 +9,7 @@ const links = [
   { to: "/simulation", label: "MCI Sim" },
   { to: "/loadtest", label: "⚡ Hammer", highlight: true },
   { to: "/carrier-readiness", label: "⚓ Carrier", highlight: false, accent: true },
+  { to: "/mesh-c2", label: "🛰 Mesh C2", highlight: false, mesh: true },
   { to: "/innovation", label: "Innovation" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
@@ -71,6 +72,10 @@ export default function Nav() {
                       ? isActive
                         ? "text-amber-300 bg-amber-500/20 border border-amber-500/40"
                         : "text-amber-400 border border-amber-500/30 hover:bg-amber-500/10"
+                      : l.mesh
+                      ? isActive
+                        ? "text-green-300 bg-green-500/20 border border-green-500/40"
+                        : "text-green-400 border border-green-500/30 hover:bg-green-500/10"
                       : isActive
                       ? "text-cyan-400 bg-cyan-400/10"
                       : "text-slate-300 hover:text-cyan-300 hover:bg-white/5"

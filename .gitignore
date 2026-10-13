@@ -6,3 +6,4 @@ harrier.log
 server.js
 dist-preview/
 .built
+template-init/
