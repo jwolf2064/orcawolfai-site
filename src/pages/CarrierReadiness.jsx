@@ -35,12 +35,14 @@ function buildSemanticSummary({ vessel, threatType, threatIntensity, crewCount, 
 }
 
 // ─── Radial dial ──────────────────────────────────────────────────────────────
-function RadialDial({ value, label, size = 120, thresholds = { red: 30, yellow: 60 } }) {
-  const pct = Math.min(Math.max(value / 100, 0), 1);
+// color: green ≥ greenAt, amber ≥ yellowAt, red below yellowAt
+function RadialDial({ value, label, size = 120, yellowAt = 50, greenAt = 75 }) {
+  const pct   = Math.min(Math.max(value / 100, 0), 1);
   const angle = -135 + pct * 270;
-  const r = size / 2 - 12;
-  const cx = size / 2;
-  const cy = size / 2;
+  const r     = size / 2 - 12;
+  const cx    = size / 2;
+  const cy    = size / 2;
+
   const polarToXY = (deg, radius) => {
     const rad = ((deg - 90) * Math.PI) / 180;
     return { x: cx + radius * Math.cos(rad), y: cy + radius * Math.sin(rad) };
@@ -51,18 +53,25 @@ function RadialDial({ value, label, size = 120, thresholds = { red: 30, yellow: 
     const large = endDeg - startDeg > 180 ? 1 : 0;
     return `M ${s.x} ${s.y} A ${radius} ${radius} 0 ${large} 1 ${e.x} ${e.y}`;
   };
-  const color = value <= thresholds.red ? "#ef4444" : value <= thresholds.yellow ? "#f59e0b" : "#22d3ee";
+
+  // Green = safe, Amber = caution, Red = danger
+  const color = value >= greenAt ? "#22c55e" : value >= yellowAt ? "#f59e0b" : "#ef4444";
   const needle = polarToXY(angle, r - 8);
+
   return (
     <div className="flex flex-col items-center gap-1">
       <svg width={size} height={size} aria-label={`${label}: ${Math.round(value)}%`} role="img">
+        {/* Track */}
         <path d={describeArc(-135 + 90, 135 + 90, r)} fill="none" stroke="#1e293b" strokeWidth="8" strokeLinecap="round" />
+        {/* Coloured arc */}
         {pct > 0 && (
           <path d={describeArc(-135 + 90, angle + 90, r)} fill="none" stroke={color} strokeWidth="8" strokeLinecap="round"
-            style={{ filter: `drop-shadow(0 0 4px ${color})` }} />
+            style={{ filter: `drop-shadow(0 0 5px ${color})` }} />
         )}
+        {/* Needle */}
         <line x1={cx} y1={cy} x2={needle.x} y2={needle.y} stroke={color} strokeWidth="2" strokeLinecap="round" />
         <circle cx={cx} cy={cy} r="4" fill={color} />
+        {/* Value label */}
         <text x={cx} y={cy + 20} textAnchor="middle" fill={color} fontSize="14" fontWeight="700" fontFamily="monospace">
           {Math.round(value)}%
         </text>
@@ -360,6 +369,8 @@ export default function CarrierReadiness() {
   const [saving,         setSaving]         = useState(false);
   const [saveMsg,        setSaveMsg]        = useState("");
   const [runTimestamp,   setRunTimestamp]   = useState(null);
+  const [meshEvents,     setMeshEvents]     = useState([]);
+  const [liveReadiness,  setLiveReadiness]  = useState({ cvn68: null, cvn71: null });
   const logRef  = useRef(null);
   const timerRef= useRef(null);
 
@@ -376,6 +387,32 @@ export default function CarrierReadiness() {
     const cleanup = loadHistory();
     return cleanup;
   }, [loadHistory]);
+
+  // ── Listen for live NATS telemetry from Mesh C2 Dashboard ──────────────────
+  useEffect(() => {
+    const handler = (e) => {
+      const d = e.detail;
+      if (!d) return;
+      // Update live readiness score for the carrier
+      setLiveReadiness(prev => ({
+        ...prev,
+        [d.carrier_id]: d.fleet_readiness_pct,
+      }));
+      // Append to mesh event feed (keep last 30)
+      setMeshEvents(prev => [{
+        ts: new Date().toISOString().split("T")[1].slice(0, 8),
+        carrierId: d.carrier_id,
+        carrier: d.carrier,
+        role: d.line_of_duty,
+        flag: d.event_flag,
+        effective: d.combat_effective,
+        tbi: d.tbi_watch_count,
+        readiness: d.fleet_readiness_pct,
+      }, ...prev].slice(0, 30));
+    };
+    window.addEventListener("orcawolf:mesh-telemetry", handler);
+    return () => window.removeEventListener("orcawolf:mesh-telemetry", handler);
+  }, []);
 
   useEffect(() => {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
@@ -643,6 +680,48 @@ export default function CarrierReadiness() {
           </div>
         </section>
 
+        {/* Live Mesh C2 Telemetry Feed */}
+        {meshEvents.length > 0 && (
+          <section aria-labelledby="mesh-feed-heading" className="bg-[#040d17] border border-emerald-900/40 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+              <h2 id="mesh-feed-heading" className="text-xs font-mono text-emerald-400 tracking-widest uppercase flex items-center gap-2">
+                <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
+                Live NATS Mesh Telemetry — Sovereign Mesh C2 Dashboard
+              </h2>
+              <div className="flex items-center gap-6">
+                {["cvn68","cvn71"].map(id => liveReadiness[id] != null ? (
+                  <div key={id} className="text-center">
+                    <div className="text-[10px] text-slate-500 font-mono uppercase">{id === "cvn68" ? "CVN-68" : "CVN-71"} Live</div>
+                    <div className="text-lg font-mono font-bold" style={{ color: liveReadiness[id] >= 75 ? "#22c55e" : liveReadiness[id] >= 55 ? "#f59e0b" : "#ef4444" }}>
+                      {liveReadiness[id]}%
+                    </div>
+                  </div>
+                ) : null)}
+              </div>
+            </div>
+            <div className="space-y-1.5 max-h-48 overflow-y-auto font-mono text-xs" aria-label="Live mesh telemetry events" aria-live="polite">
+              {meshEvents.map((ev, i) => {
+                const flagColor = ev.flag === "MASCAL_IMPACT" ? "#ef4444" : ev.flag === "BLAST_EXPOSURE_DETECTED" ? "#f59e0b" : "#22c55e";
+                const rdColor   = ev.readiness >= 75 ? "#22c55e" : ev.readiness >= 55 ? "#f59e0b" : "#ef4444";
+                return (
+                  <div key={i} className="flex flex-wrap gap-x-3 gap-y-0.5 border-b border-slate-800/50 pb-1">
+                    <span className="text-slate-600">{ev.ts}</span>
+                    <span className="text-slate-500">{ev.carrier}</span>
+                    <span className="text-slate-300">{ev.role}</span>
+                    <span className="font-bold" style={{ color: flagColor }}>{ev.flag}</span>
+                    <span className="text-slate-500">eff:{ev.effective}</span>
+                    <span className="text-orange-400">TBI:{ev.tbi}</span>
+                    <span className="font-bold" style={{ color: rdColor }}>fleet:{ev.readiness}%</span>
+                  </div>
+                );
+              })}
+            </div>
+            <p className="text-[10px] text-slate-600 mt-3">
+              Open <strong className="text-slate-500">Mesh C2</strong> in another tab — live NATS events stream here in real time and drive these readiness scores.
+            </p>
+          </section>
+        )}
+
         {/* Results */}
         {result && (
           <div className="space-y-8 animate-[fadeInUp_0.4s_ease_both]">
@@ -691,26 +770,26 @@ export default function CarrierReadiness() {
                   <div className="mb-5">
                     <h3 className="text-xs font-mono text-emerald-400 tracking-widest uppercase mb-3">Medical Readiness</h3>
                     <div className="grid grid-cols-4 gap-2 justify-items-center">
-                      <RadialDial value={res.medMetrics.medical_readiness} label="Medical Readiness"    thresholds={{ red: thresholds.medical_readiness, yellow: thresholds.medical_readiness+15 }} />
-                      <RadialDial value={res.medMetrics.surgical_capacity} label="Surgical Capacity"    thresholds={{ red: thresholds.surgical_capacity, yellow: thresholds.surgical_capacity+15 }} />
-                      <RadialDial value={res.medMetrics.blood_supply}      label="Blood Supply"         thresholds={{ red: thresholds.blood_supply, yellow: thresholds.blood_supply+15 }} />
-                      <RadialDial value={res.medMetrics.pharmacy}          label="Pharmacy / Formulary" thresholds={{ red: thresholds.pharmacy, yellow: thresholds.pharmacy+15 }} />
-                      <RadialDial value={res.medMetrics.personnel_fit}     label="Personnel Fitness"    thresholds={{ red: thresholds.personnel_fit, yellow: thresholds.personnel_fit+10 }} />
-                      <RadialDial value={res.medMetrics.mental_health}     label="Mental Health / PTSD" thresholds={{ red: 40, yellow: 60 }} />
-                      <RadialDial value={res.medMetrics.preventive_med}    label="Preventive Medicine"  thresholds={{ red: 50, yellow: 65 }} />
-                      <RadialDial value={res.medMetrics.dental_readiness}  label="Dental Readiness"     thresholds={{ red: 60, yellow: 75 }} />
+                      <RadialDial value={res.medMetrics.medical_readiness} label="Medical Readiness"    yellowAt={thresholds.medical_readiness}    greenAt={thresholds.medical_readiness+15} />
+                      <RadialDial value={res.medMetrics.surgical_capacity} label="Surgical Capacity"    yellowAt={thresholds.surgical_capacity}    greenAt={thresholds.surgical_capacity+15} />
+                      <RadialDial value={res.medMetrics.blood_supply}      label="Blood Supply"         yellowAt={thresholds.blood_supply}         greenAt={thresholds.blood_supply+15} />
+                      <RadialDial value={res.medMetrics.pharmacy}          label="Pharmacy / Formulary" yellowAt={thresholds.pharmacy}             greenAt={thresholds.pharmacy+15} />
+                      <RadialDial value={res.medMetrics.personnel_fit}     label="Personnel Fitness"    yellowAt={thresholds.personnel_fit}        greenAt={thresholds.personnel_fit+10} />
+                      <RadialDial value={res.medMetrics.mental_health}     label="Mental Health / PTSD" yellowAt={40} greenAt={60} />
+                      <RadialDial value={res.medMetrics.preventive_med}    label="Preventive Medicine"  yellowAt={50} greenAt={70} />
+                      <RadialDial value={res.medMetrics.dental_readiness}  label="Dental Readiness"     yellowAt={60} greenAt={78} />
                     </div>
                   </div>
 
                   <div className="mb-5">
                     <h3 className="text-xs font-mono text-amber-400 tracking-widest uppercase mb-3">Line-of-Duty Readiness</h3>
                     <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 justify-items-center">
-                      <RadialDial value={res.lodMetrics.watchstation_fill}     label="Watch Station Fill"    thresholds={{ red: thresholds.watchstation_fill, yellow: thresholds.watchstation_fill+10 }} />
-                      <RadialDial value={res.lodMetrics.dc_certification}      label="DC Certification"      thresholds={{ red: thresholds.dc_certification, yellow: thresholds.dc_certification+10 }} />
-                      <RadialDial value={res.lodMetrics.flight_deck_crew}      label="Flight Deck Crew"      thresholds={{ red: thresholds.flight_deck_crew, yellow: thresholds.flight_deck_crew+10 }} />
-                      <RadialDial value={res.lodMetrics.battle_station_assign} label="Battle Station Assign" thresholds={{ red: 70, yellow: 82 }} />
-                      <RadialDial value={res.lodMetrics.watch_qual}            label="Watch Qualifications"  thresholds={{ red: 60, yellow: 75 }} />
-                      <RadialDial value={res.lodMetrics.damage_ctrl_ready}     label="Damage Control Ready"  thresholds={{ red: thresholds.dc_certification, yellow: thresholds.dc_certification+10 }} />
+                      <RadialDial value={res.lodMetrics.watchstation_fill}     label="Watch Station Fill"    yellowAt={thresholds.watchstation_fill}    greenAt={thresholds.watchstation_fill+12} />
+                      <RadialDial value={res.lodMetrics.dc_certification}      label="DC Certification"      yellowAt={thresholds.dc_certification}     greenAt={thresholds.dc_certification+12} />
+                      <RadialDial value={res.lodMetrics.flight_deck_crew}      label="Flight Deck Crew"      yellowAt={thresholds.flight_deck_crew}     greenAt={thresholds.flight_deck_crew+12} />
+                      <RadialDial value={res.lodMetrics.battle_station_assign} label="Battle Station Assign" yellowAt={65} greenAt={80} />
+                      <RadialDial value={res.lodMetrics.watch_qual}            label="Watch Qualifications"  yellowAt={55} greenAt={72} />
+                      <RadialDial value={res.lodMetrics.damage_ctrl_ready}     label="Damage Control Ready"  yellowAt={thresholds.dc_certification}     greenAt={thresholds.dc_certification+12} />
                     </div>
                   </div>
 

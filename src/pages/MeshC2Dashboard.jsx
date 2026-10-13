@@ -134,6 +134,12 @@ export default function MeshC2Dashboard() {
             log.prepend(entry);
         }
 
+        function computeFleetReadiness(carrierId) {
+            let total = 0, effective = 0;
+            roles.forEach(r => { total += fleetState[carrierId][r].total; effective += fleetState[carrierId][r].effective; });
+            return parseFloat(((effective / total) * 100).toFixed(1));
+        }
+
         function generateEvent() {
             const c = carriers[Math.floor(Math.random() * carriers.length)];
             const r = roles[Math.floor(Math.random() * roles.length)];
@@ -154,15 +160,23 @@ export default function MeshC2Dashboard() {
                 state.injured -= actualRecovered; state.effective += actualRecovered;
                 flag = "RTD_CLEARED"; color = "text-green-400";
             } else { return; }
+
+            const readiness = computeFleetReadiness(c.id);
             const eventPayload = {
                 id: Math.random().toString(36).slice(2,10),
                 topic: 'mesh.triage.' + c.id + '.' + r.replace(/\\s+/g,'').toLowerCase() + '.' + flag,
-                carrier: c.name, line_of_duty: r, event_flag: flag,
-                combat_effective: state.effective, tbi_watch_count: state.tbi
+                carrier: c.name, carrier_id: c.id, line_of_duty: r, event_flag: flag,
+                combat_effective: state.effective, tbi_watch_count: state.tbi,
+                fleet_readiness_pct: readiness
             };
             logEvent(eventPayload, color);
             renderRoles();
             updateOverall();
+
+            // Emit to parent React app for Carrier Readiness dial integration
+            try {
+                window.parent.dispatchEvent(new CustomEvent('orcawolf:mesh-telemetry', { detail: eventPayload }));
+            } catch(e) {}
         }
 
         renderRoles();
