@@ -58,76 +58,37 @@ const PILLARS = [
   },
 ];
 
-function MeshDiagram() {
+function EcosystemImage() {
   return (
-    <div className="relative w-full max-w-sm mx-auto h-64 select-none" aria-hidden="true">
-      {/* Central node */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-cyan-400/20 border border-cyan-400/50 flex items-center justify-center animate-node-pulse z-10">
-        <span className="text-cyan-400 font-mono text-xs font-bold">OW</span>
-      </div>
-
-      {/* Orbital nodes */}
-      {[
-        { label: "EHR", angle: 0, color: "#00e5ff" },
-        { label: "mTLS", angle: 60, color: "#4fc3f7" },
-        { label: "AI", angle: 120, color: "#6ee7b7" },
-        { label: "Istio", angle: 180, color: "#00e5ff" },
-        { label: "FHIR", angle: 240, color: "#fbbf24" },
-        { label: "K8s", angle: 300, color: "#a78bfa" },
-      ].map(({ label, angle, color }) => {
-        const rad = (angle * Math.PI) / 180;
-        const r = 90;
-        const cx = 50 + r * Math.cos(rad - Math.PI / 2);
-        const cy = 50 + r * Math.sin(rad - Math.PI / 2);
-        return (
-          <div
+    <div className="relative w-full max-w-5xl mx-auto mt-16 select-none group" aria-label="OrcaWolf AI global ecosystem — StarShield satellite backhaul connecting carriers, hospital ships and next echelons of care">
+      {/* Outer glow ring */}
+      <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-cyan-400/20 via-blue-500/10 to-cyan-400/20 blur-xl opacity-60 group-hover:opacity-90 transition-opacity duration-700 pointer-events-none" aria-hidden="true" />
+      {/* Image */}
+      <img
+        src="/static/gen_orcawolfai-ecosystem-hero-39ada8.webp"
+        alt="OrcaWolf AI sovereign mesh ecosystem — StarShield satellite constellation connecting two US Navy carriers, USNS Mercy hospital ship, and Kuwait coalition hospital via cyan mesh telemetry arcs"
+        className="relative w-full rounded-2xl border border-cyan-400/20 shadow-[0_0_80px_rgba(0,229,255,0.15)] object-cover"
+        style={{ maxHeight: "520px" }}
+      />
+      {/* Caption bar */}
+      <div className="absolute bottom-0 left-0 right-0 rounded-b-2xl bg-gradient-to-t from-[#050a0f]/90 to-transparent px-6 py-4 flex flex-wrap items-center gap-3">
+        {[
+          { label: "StarShield Backhaul", color: "#fbbf24" },
+          { label: "Carrier Strike Group", color: "#00e5ff" },
+          { label: "USNS Hospital Ship", color: "#6ee7b7" },
+          { label: "Role 4 — Kuwait", color: "#f97316" },
+          { label: "Sovereign Mesh", color: "#a78bfa" },
+        ].map(({ label, color }) => (
+          <span
             key={label}
-            className="absolute flex flex-col items-center"
-            style={{
-              left: `calc(${cx}% - 20px)`,
-              top: `calc(${cy}% - 16px)`,
-            }}
+            className="inline-flex items-center gap-1.5 text-[11px] font-mono font-medium px-2 py-1 rounded-full"
+            style={{ background: `${color}18`, border: `1px solid ${color}40`, color }}
           >
-            {/* connection line — rendered via svg overlay */}
-            <div
-              className="w-10 h-10 rounded-full flex items-center justify-center"
-              style={{
-                background: `${color}15`,
-                border: `1px solid ${color}40`,
-              }}
-            >
-              <span className="text-[10px] font-mono font-medium" style={{ color }}>
-                {label}
-              </span>
-            </div>
-          </div>
-        );
-      })}
-
-      {/* SVG connection lines */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 200 200">
-        {[0, 60, 120, 180, 240, 300].map((angle) => {
-          const rad = (angle * Math.PI) / 180;
-          const r = 90;
-          const cx = 100 + r * 0.44 * Math.cos(rad - Math.PI / 2);
-          const cy = 100 + r * 0.55 * Math.sin(rad - Math.PI / 2);
-          return (
-            <line
-              key={angle}
-              x1="100"
-              y1="100"
-              x2={cx}
-              y2={cy}
-              stroke="rgba(0,229,255,0.2)"
-              strokeWidth="1"
-              strokeDasharray="4 3"
-            />
-          );
-        })}
-        {/* Outer ring */}
-        <circle cx="100" cy="100" r="76" stroke="rgba(0,229,255,0.08)" strokeWidth="1" fill="none" />
-        <circle cx="100" cy="100" r="48" stroke="rgba(79,195,247,0.08)" strokeWidth="1" fill="none" />
-      </svg>
+            <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: color }} aria-hidden="true" />
+            {label}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
@@ -203,9 +164,9 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Mesh diagram */}
-        <div className="animate-fade-in delay-600 mt-16 w-full max-w-sm mx-auto">
-          <MeshDiagram />
+        {/* Ecosystem image */}
+        <div className="animate-fade-in delay-600 w-full px-4">
+          <EcosystemImage />
         </div>
       </section>
 
