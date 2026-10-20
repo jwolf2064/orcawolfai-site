@@ -1,6 +1,97 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { pb } from "../lib/pb";
 
+// ─── Persisted calibration key ────────────────────────────────────────────────
+const CALIB_KEY = "orcawolf_calib_v2";
+function loadCalib() {
+  try { return JSON.parse(localStorage.getItem(CALIB_KEY)) || null; } catch { return null; }
+}
+function saveCalib(data) {
+  try { localStorage.setItem(CALIB_KEY, JSON.stringify(data)); } catch {}
+}
+
+// ─── Theater of operations presets ───────────────────────────────────────────
+const THEATERS = [
+  { id: "hormuz",    label: "Strait of Hormuz",  lat: 26.6,  lng: 56.5,  desc: "High-density maritime chokepoint — drone & mine threat" },
+  { id: "red_sea",  label: "Red Sea",            lat: 17.5,  lng: 41.5,  desc: "Houthi anti-ship missile corridor — EW-degraded GPS" },
+  { id: "gulf",     label: "Persian Gulf",        lat: 26.0,  lng: 51.0,  desc: "Shallow-water ASW environment — CBRN exposure risk" },
+  { id: "yemen",    label: "Yemen Coast",         lat: 13.5,  lng: 45.5,  desc: "Littoral drone swarm launch zones — coastal SAM belt" },
+  { id: "scs",      label: "South China Sea",     lat: 12.0,  lng: 115.0, desc: "Blue-water contested airspace — sea-skim missile threat" },
+  { id: "med",      label: "Eastern Mediterranean",lat:34.5, lng: 29.0,  desc: "Multi-domain contested space — combined arms threat" },
+  { id: "custom",   label: "Custom Coordinates",  lat: null,  lng: null,  desc: "Enter latitude and longitude manually" },
+];
+
+// ─── Echelon of care facilities by theater ────────────────────────────────────
+const ECHELONS = {
+  hormuz: [
+    { id:"e1", role:"Role 4", name:"Landstuhl Regional Medical Center", loc:"Landstuhl, Germany", lat:49.37, lng:7.57, nm:2800, type:"hospital", assets:["C-17 Strategic MEDEVAC (8h)"] },
+    { id:"e2", role:"Role 3", name:"USNS Mercy (T-AH-19)", loc:"Arabian Gulf", lat:24.5, lng:55.2, nm:210, type:"ship", assets:["MH-60S Seahawk","LCU transfer"] },
+    { id:"e3", role:"Role 2+", name:"Camp Arifjan Role 2+", loc:"Kuwait", lat:29.1, lng:47.9, nm:380, type:"fob", assets:["CH-47 Chinook (2h)","C-130 (3h)"] },
+    { id:"e4", role:"Role 2", name:"USS Bataan (LHD-5) BAS", loc:"Arabian Gulf", lat:25.8, lng:56.1, nm:95, type:"ship", assets:["MH-60S Seahawk (45min)"] },
+  ],
+  red_sea: [
+    { id:"e1", role:"Role 4", name:"Landstuhl Regional Medical Center", loc:"Landstuhl, Germany", lat:49.37, lng:7.57, nm:3100, type:"hospital", assets:["C-17 Strategic MEDEVAC (9h)"] },
+    { id:"e2", role:"Role 3", name:"Camp Lemonnier Role 3", loc:"Djibouti", lat:11.55, lng:43.15, nm:280, type:"fob", assets:["C-130 (2.5h)","UH-60 (4h)"] },
+    { id:"e3", role:"Role 2+", name:"USNS Comfort (T-AH-20)", loc:"Red Sea", lat:15.5, lng:41.8, nm:130, type:"ship", assets:["MH-60S Seahawk (1h)","RHIB transfer"] },
+    { id:"e4", role:"Role 2", name:"USS Gerald R. Ford BAS", loc:"Red Sea", lat:17.0, lng:41.2, nm:60, type:"ship", assets:["MH-60S Seahawk (30min)"] },
+  ],
+  gulf: [
+    { id:"e1", role:"Role 4", name:"Landstuhl Regional Medical Center", loc:"Landstuhl, Germany", lat:49.37, lng:7.57, nm:2900, type:"hospital", assets:["C-17 Strategic MEDEVAC (8.5h)"] },
+    { id:"e2", role:"Role 3", name:"USNS Mercy (T-AH-19)", loc:"Arabian Gulf", lat:24.5, lng:55.2, nm:150, type:"ship", assets:["MH-60S Seahawk (1h)","LCU transfer"] },
+    { id:"e3", role:"Role 2+", name:"Camp Arifjan Role 2+", loc:"Kuwait", lat:29.1, lng:47.9, nm:290, type:"fob", assets:["CH-47 Chinook (1.5h)"] },
+    { id:"e4", role:"Role 2", name:"NSA Bahrain Branch Medical", loc:"Bahrain", lat:26.2, lng:50.6, nm:85, type:"fob", assets:["MH-60S Seahawk (40min)","LCU (2h)"] },
+  ],
+  yemen: [
+    { id:"e1", role:"Role 4", name:"Landstuhl Regional Medical Center", loc:"Landstuhl, Germany", lat:49.37, lng:7.57, nm:3200, type:"hospital", assets:["C-17 Strategic MEDEVAC (9.5h)"] },
+    { id:"e2", role:"Role 3", name:"Camp Lemonnier Role 3", loc:"Djibouti", lat:11.55, lng:43.15, nm:175, type:"fob", assets:["C-130 (1.5h)","UH-60 (3h)"] },
+    { id:"e3", role:"Role 2+", name:"USNS Comfort (T-AH-20)", loc:"Gulf of Aden", lat:12.5, lng:44.2, nm:95, type:"ship", assets:["MH-60S Seahawk (50min)"] },
+    { id:"e4", role:"Role 2", name:"USS Bataan (LHD-5) BAS", loc:"Gulf of Aden", lat:13.0, lng:45.0, nm:40, type:"ship", assets:["MH-60S Seahawk (20min)","RHIB (1h)"] },
+  ],
+  scs: [
+    { id:"e1", role:"Role 4", name:"Tripler Army Medical Center", loc:"Honolulu, HI", lat:21.37, lng:-157.89, nm:4200, type:"hospital", assets:["C-17 Strategic MEDEVAC (11h)"] },
+    { id:"e2", role:"Role 3", name:"USNS Mercy (T-AH-19)", loc:"South China Sea", lat:14.0, lng:117.0, nm:180, type:"ship", assets:["MH-60S Seahawk (1.5h)","LCU transfer"] },
+    { id:"e3", role:"Role 2+", name:"Camp Navarro Role 2+", loc:"Cagayan de Oro, Philippines", lat:8.47, lng:124.65, nm:320, type:"fob", assets:["C-130 (2.5h)"] },
+    { id:"e4", role:"Role 2", name:"USS America (LHA-6) BAS", loc:"South China Sea", lat:12.5, lng:116.5, nm:75, type:"ship", assets:["MH-60S Seahawk (35min)"] },
+  ],
+  med: [
+    { id:"e1", role:"Role 4", name:"Landstuhl Regional Medical Center", loc:"Landstuhl, Germany", lat:49.37, lng:7.57, nm:1400, type:"hospital", assets:["C-17 Strategic MEDEVAC (4.5h)"] },
+    { id:"e2", role:"Role 3", name:"NATO Role 3 — Souda Bay", loc:"Crete, Greece", lat:35.49, lng:24.15, nm:250, type:"fob", assets:["C-130 (2h)","UH-60 (3.5h)"] },
+    { id:"e3", role:"Role 2+", name:"USNS Comfort (T-AH-20)", loc:"Eastern Med", lat:34.0, lng:30.0, nm:120, type:"ship", assets:["MH-60S Seahawk (55min)"] },
+    { id:"e4", role:"Role 2", name:"USS Harry S. Truman BAS", loc:"Eastern Med", lat:34.5, lng:29.5, nm:55, type:"ship", assets:["MH-60S Seahawk (25min)"] },
+  ],
+  custom: [],
+};
+
+// ─── MedEvac asset classes ────────────────────────────────────────────────────
+const MEDEVAC_CLASSES = [
+  { id:"mh60s",  label:"MH-60S Seahawk",        range_nm:150, capacity:6,  category:"rotary" },
+  { id:"ch53e",  label:"CH-53E Super Stallion",  range_nm:200, capacity:24, category:"rotary" },
+  { id:"uh1y",   label:"UH-1Y Venom",            range_nm:110, capacity:4,  category:"rotary" },
+  { id:"c130",   label:"C-130 Hercules",          range_nm:1800,capacity:74, category:"fixed" },
+  { id:"c17",    label:"C-17 Globemaster III",    range_nm:4000,capacity:100,category:"fixed" },
+  { id:"lcu",    label:"LCU Watercraft",          range_nm:80,  capacity:12, category:"sea" },
+  { id:"rhib",   label:"RHIB Fast Transfer",      range_nm:40,  capacity:8,  category:"sea" },
+];
+
+const DEFAULT_MEDEVAC = { mh60s:4, ch53e:2, uh1y:2, c130:1, c17:0, lcu:2, rhib:4 };
+const DEFAULT_CALIB = {
+  thresholds: {
+    medical_readiness:85, surgical_capacity:70, blood_supply:75,
+    personnel_fit:90, watchstation_fill:85, dc_certification:80,
+    flight_deck_crew:88, pharmacy:72,
+  },
+  lod: {
+    pilots:100, navigators:100, medical_personnel:120,
+    firemen:80, weapon_ops:200, deck_crew:350,
+  },
+  blood: { o_neg:120, a_pos:200, b_pos:80, ab_pos:40, platelets:60, plasma:100 },
+  medevac: DEFAULT_MEDEVAC,
+  theater: "hormuz",
+  customLat: "",
+  customLng: "",
+  selectedEchelon: "e3",
+};
+
 // ─── Deterministic PRNG ───────────────────────────────────────────────────────
 function seededRand(seed) {
   let s = seed;
@@ -350,6 +441,405 @@ function HistoryCard({ rec }) {
   );
 }
 
+// ─── Theater Map ─────────────────────────────────────────────────────────────
+function TheaterMap({ theater, customLat, customLng, echelons, selectedEchelon, onSelectEchelon, carrierPos }) {
+  const mapRef = useRef(null);
+  const mapInstanceRef = useRef(null);
+  const markersRef = useRef([]);
+
+  const theaterObj = THEATERS.find(t => t.id === theater) || THEATERS[0];
+  const lat = theater === "custom" ? parseFloat(customLat) || 25 : theaterObj.lat;
+  const lng = theater === "custom" ? parseFloat(customLng) || 55 : theaterObj.lng;
+
+  useEffect(() => {
+    if (!mapRef.current || typeof window === "undefined" || !window.L) return;
+    const L = window.L;
+    if (mapInstanceRef.current) { mapInstanceRef.current.remove(); mapInstanceRef.current = null; }
+
+    const map = L.map(mapRef.current, { zoomControl: true, scrollWheelZoom: false }).setView([lat, lng], 6);
+    mapInstanceRef.current = map;
+
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+      attribution: '© OpenStreetMap © CARTO',
+      subdomains: "abcd", maxZoom: 14,
+    }).addTo(map);
+
+    // Carrier position marker
+    const carrierIcon = L.divIcon({
+      html: `<div style="width:28px;height:28px;background:#0e7490;border:2px solid #22d3ee;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 0 12px #22d3ee88;">⚓</div>`,
+      className:"", iconAnchor:[14,14],
+    });
+    L.marker([lat, lng], { icon: carrierIcon })
+      .addTo(map)
+      .bindPopup(`<b style="color:#22d3ee">${carrierPos}</b><br><span style="font-size:11px;color:#94a3b8">${theaterObj.label} — Exercise Position</span>`);
+
+    // 200nm CASEVAC radius ring (~370km)
+    L.circle([lat, lng], { radius: 370400, color: "#22d3ee", weight: 1, opacity: 0.4, fill: true, fillColor: "#22d3ee", fillOpacity: 0.05 })
+      .addTo(map).bindTooltip("200 nm CASEVAC Radius", { permanent: false, direction: "top" });
+
+    // Echelon markers
+    markersRef.current = [];
+    echelons.forEach(e => {
+      const isSelected = e.id === selectedEchelon;
+      const roleColors = { "Role 4":"#ef4444","Role 3":"#f97316","Role 2+":"#f59e0b","Role 2":"#22c55e" };
+      const color = roleColors[e.role] || "#94a3b8";
+      const typeIcon = e.type === "ship" ? "⚕" : e.type === "hospital" ? "🏥" : "🏕";
+      const icon = L.divIcon({
+        html: `<div style="width:${isSelected?32:24}px;height:${isSelected?32:24}px;background:${color}22;border:${isSelected?3:2}px solid ${color};border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:${isSelected?16:12}px;box-shadow:0 0 ${isSelected?16:8}px ${color}66;cursor:pointer;">${typeIcon}</div>`,
+        className:"", iconAnchor:[isSelected?16:12,isSelected?16:12],
+      });
+      const marker = L.marker([e.lat, e.lng], { icon })
+        .addTo(map)
+        .bindPopup(`<div style="min-width:200px;font-family:monospace;font-size:11px;">
+          <div style="color:${color};font-weight:bold;margin-bottom:4px;">${e.role} — ${e.name}</div>
+          <div style="color:#94a3b8;">${e.loc}</div>
+          <div style="color:#64748b;margin-top:4px;">${e.nm} nm from position</div>
+          <div style="color:#22c55e;margin-top:4px;">${e.assets.join(", ")}</div>
+          <button onclick="window.orcawolfSelectEchelon('${e.id}')" style="margin-top:6px;padding:2px 8px;background:#0e7490;color:white;border:none;border-radius:4px;cursor:pointer;font-size:10px;">Select as Next Echelon</button>
+        </div>`, { maxWidth: 240 });
+      markersRef.current.push(marker);
+
+      // Line from carrier to echelon
+      L.polyline([[lat, lng],[e.lat, e.lng]], {
+        color: isSelected ? color : color+"44",
+        weight: isSelected ? 2 : 1,
+        dashArray: isSelected ? null : "6,6",
+      }).addTo(map);
+    });
+
+    window.orcawolfSelectEchelon = (id) => { onSelectEchelon(id); map.closePopup(); };
+    return () => { if (mapInstanceRef.current) { mapInstanceRef.current.remove(); mapInstanceRef.current = null; } delete window.orcawolfSelectEchelon; };
+  }, [theater, lat, lng, selectedEchelon, echelons, onSelectEchelon, carrierPos, theaterObj.label]);
+
+  return (
+    <div>
+      <div ref={mapRef} style={{ height: "380px", borderRadius: "8px", border: "1px solid #1e3a5f" }} aria-label="Theater of operations map" />
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        {echelons.map(e => {
+          const isSelected = e.id === selectedEchelon;
+          const roleColors = { "Role 4":"text-red-400","Role 3":"text-orange-400","Role 2+":"text-amber-400","Role 2":"text-emerald-400" };
+          const borderColors = { "Role 4":"border-red-800","Role 3":"border-orange-800","Role 2+":"border-amber-800","Role 2":"border-emerald-800" };
+          const bgColors = { "Role 4":"bg-red-900/20","Role 3":"bg-orange-900/20","Role 2+":"bg-amber-900/20","Role 2":"bg-emerald-900/20" };
+          return (
+            <button
+              key={e.id}
+              onClick={() => onSelectEchelon(e.id)}
+              className={`text-left p-3 rounded-lg border text-xs transition-all ${isSelected ? `${bgColors[e.role]} ${borderColors[e.role]}` : "border-slate-800 bg-[#050a0f] hover:border-slate-700"}`}
+              aria-pressed={isSelected}
+              aria-label={`Select ${e.name} as next echelon of care`}
+            >
+              <div className={`font-bold ${isSelected ? roleColors[e.role] : "text-slate-400"} mb-0.5`}>{e.role}</div>
+              <div className="text-slate-300 font-medium leading-tight">{e.name}</div>
+              <div className="text-slate-500 mt-0.5">{e.nm} nm · {e.assets[0]}</div>
+              {isSelected && <div className="mt-1 text-[10px] font-bold text-emerald-400">✓ SELECTED NEXT ECHELON</div>}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── Recommended Course of Action ────────────────────────────────────────────
+function RecommendedCOA({ result, result2, threatType, threatIntensity, calib, ship1, ship2, showBothShips }) {
+  if (!result) return null;
+
+  const echelons = ECHELONS[calib.theater] || [];
+  const selectedEch = echelons.find(e => e.id === calib.selectedEchelon) || echelons[1] || echelons[0];
+  const threatLabel = THREAT_TYPES.find(t => t.id === threatType)?.label || threatType;
+  const medAvail = Object.values(calib.medevac).reduce((s,v) => s+v, 0);
+  const totalBlood = Object.values(calib.blood).reduce((s,v) => s+v, 0);
+
+  const actions = [];
+  const r = result;
+
+  // Priority 1 — Casualties
+  if (r.immediate > 0) actions.push({ priority: 1, category: "MEDICAL", urgency: "IMMEDIATE", color: "text-red-400", border: "border-red-800/60", bg: "bg-red-900/10",
+    action: `Activate Mass Casualty Bill — ${r.immediate} IMMEDIATE casualties require surgical intervention within 60 minutes.`,
+    detail: `All ${calib.lod.medical_personnel} medical personnel to battle stations. Open all ${Math.max(1,Math.round(r.immediate/4))} ORs simultaneously.` });
+
+  if (r.medMetrics.blood_supply < 40) actions.push({ priority: 1, category: "SUPPLY", urgency: "CRITICAL", color: "text-red-400", border: "border-red-800/60", bg: "bg-red-900/10",
+    action: `Blood supply at ${Math.round(r.medMetrics.blood_supply)}% — initiate emergency resupply via ${selectedEch?.name || "next echelon"}.`,
+    detail: `Current stock: O-neg ${calib.blood.o_neg}u, Platelets ${calib.blood.platelets}u. Request ${Math.round(r.cas*0.5)}u whole blood equivalent via ${selectedEch?.assets[0] || "VERTREP"}.` });
+
+  // Priority 2 — MEDEVAC
+  if (r.cas > 50 || r.medMetrics.surgical_capacity < 50) actions.push({ priority: 2, category: "MEDEVAC", urgency: "URGENT", color: "text-amber-400", border: "border-amber-800/60", bg: "bg-amber-900/10",
+    action: `Launch MEDEVAC lift to ${selectedEch?.name || "next echelon of care"} (${selectedEch?.nm || "?"} nm).`,
+    detail: `Recommend ${Math.min(calib.medevac.mh60s, Math.ceil(r.delayed/6))} × MH-60S Seahawk sorties for ${r.delayed} DELAYED casualties. ETA to ${selectedEch?.role}: ${selectedEch?.assets[0] || "TBD"}.` });
+
+  // Priority 3 — Threat-specific
+  if (threatType === "ew_gps" || threatType === "combined") actions.push({ priority: 2, category: "NAVIGATION", urgency: "URGENT", color: "text-amber-400", border: "border-amber-800/60", bg: "bg-amber-900/10",
+    action: "GPS denial confirmed — transition all navigation to SINS/INS and celestial backup.",
+    detail: `Enforce EMCON Alpha. ${Math.round(r.lodMetrics.watchstation_fill)}% watch stations filled — prioritize Navigation and Combat Systems departments. Brief all officers of the deck.` });
+
+  if (threatType === "cbrn" || threatType === "combined") actions.push({ priority: 1, category: "CBRN", urgency: "IMMEDIATE", color: "text-red-400", border: "border-red-800/60", bg: "bg-red-900/10",
+    action: "CBRN contamination event — order MOPP Level 4 ship-wide, isolate affected spaces.",
+    detail: `Activate decontamination stations on the fo'c'sle and fantail. Medical personnel to don MOPP gear before treating casualties. Request CBRN specialist support from ${selectedEch?.name || "next echelon"}.` });
+
+  if (threatType === "drone_swarm" || threatType === "combined") actions.push({ priority: 2, category: "AIR DEFENSE", urgency: "URGENT", color: "text-amber-400", border: "border-amber-800/60", bg: "bg-amber-900/10",
+    action: "Drone swarm engagement — CIWS to auto, SM-6 batteries to free fire, electronic countermeasures active.",
+    detail: `Flight deck operations suspended during active engagement. ${calib.lod.deck_crew} deck crew to shelter stations. Resume flight ops only when airspace is clear — coordinate with CAG.` });
+
+  // Priority 3 — LOD
+  if (r.lodMetrics.watchstation_fill < 70) actions.push({ priority: 3, category: "MANNING", urgency: "ROUTINE", color: "text-emerald-400", border: "border-emerald-800/60", bg: "bg-emerald-900/10",
+    action: `Watch station fill at ${Math.round(r.lodMetrics.watchstation_fill)}% — cross-deck personnel from ${showBothShips && result2 ? ship2?.name : "reserve pool"}.`,
+    detail: `Request augmentation from ${selectedEch?.name}. Priority: Combat Systems (${Math.round(r.deptReadiness[3])}%), Navigation (${Math.round(r.deptReadiness[5])}%).` });
+
+  if (r.medMetrics.mental_health < 50) actions.push({ priority: 3, category: "PSYCH", urgency: "ROUTINE", color: "text-emerald-400", border: "border-emerald-800/60", bg: "bg-emerald-900/10",
+    action: "Combat stress indicators elevated — activate Fleet Mental Health Officer and BAS counseling.",
+    detail: `Implement crew rest rotation. Brief all department heads on combat stress recognition. Schedule chaplain rounds in berthing. RTD review at 72h for all affected personnel.` });
+
+  // Overall COA recommendation
+  const overallStatus = r.threatLevel;
+  const topCOA = overallStatus === "CRITICAL"
+    ? `WITHDRAW TO SAFE DISTANCE — Overall readiness ${Math.round(r.overall)}% is below combat-effective threshold. Request immediate relief from ${selectedEch?.name}. Medical evacuation of ${r.immediate + r.delayed} priority casualties is URGENT.`
+    : overallStatus === "HIGH"
+    ? `CONTINUE MISSION WITH RESTRICTIONS — Degraded readiness at ${Math.round(r.overall)}%. Limit offensive operations. Prioritize casualty care and resupply. Coordinate with ${selectedEch?.name} for MEDEVAC support.`
+    : overallStatus === "ELEVATED"
+    ? `CONTINUE MISSION — Readiness ${Math.round(r.overall)}% is manageable. Maintain heightened vigilance. Execute medical resupply within 24h. Monitor blood supply and pharmacy levels closely.`
+    : `MAINTAIN OPERATIONAL TEMPO — Readiness ${Math.round(r.overall)}% is combat-effective. Continue current posture. Conduct after-action review within 12h.`;
+
+  return (
+    <section aria-labelledby="rcoa-heading" className="bg-[#040d17] border border-violet-900/40 rounded-xl p-6 space-y-5">
+      <div className="flex items-center gap-3 flex-wrap">
+        <h2 id="rcoa-heading" className="text-xs font-mono text-violet-400 tracking-widest uppercase">⚑ Recommended Course of Action</h2>
+        <span className={`text-[10px] px-2 py-0.5 rounded font-bold tracking-widest border ${
+          r.threatLevel === "CRITICAL" ? "bg-red-900/40 text-red-300 border-red-700/50" :
+          r.threatLevel === "HIGH"     ? "bg-orange-900/40 text-orange-300 border-orange-700/50" :
+          r.threatLevel === "ELEVATED" ? "bg-yellow-900/40 text-yellow-300 border-yellow-700/50" :
+          "bg-emerald-900/40 text-emerald-300 border-emerald-700/50"
+        }`}>{r.threatLevel}</span>
+        <span className="text-[10px] text-slate-500 font-mono">UNCLASSIFIED // FOR EXERCISE USE ONLY</span>
+      </div>
+
+      {/* Commander's top-line recommendation */}
+      <div className={`p-4 rounded-lg border ${
+        r.threatLevel === "CRITICAL" ? "border-red-700/60 bg-red-900/15" :
+        r.threatLevel === "HIGH"     ? "border-orange-700/60 bg-orange-900/15" :
+        r.threatLevel === "ELEVATED" ? "border-amber-700/60 bg-amber-900/15" :
+        "border-emerald-700/60 bg-emerald-900/15"
+      }`}>
+        <div className="text-[10px] font-mono text-slate-500 mb-2 tracking-widest">COMMANDING OFFICER RECOMMENDATION</div>
+        <p className="text-sm text-white font-medium leading-relaxed">{topCOA}</p>
+      </div>
+
+      {/* Prioritized action items */}
+      <div className="space-y-2">
+        <div className="text-[10px] font-mono text-slate-500 tracking-widest uppercase">Prioritized Action Items</div>
+        {actions.sort((a,b) => a.priority - b.priority).map((a, i) => (
+          <div key={i} className={`p-3 rounded-lg border ${a.border} ${a.bg}`}>
+            <div className="flex items-start gap-3">
+              <div className="shrink-0 mt-0.5">
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${a.border} ${a.color} font-mono`}>P{a.priority}</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap mb-1">
+                  <span className={`text-[10px] font-mono font-bold ${a.color} tracking-wide`}>{a.category}</span>
+                  <span className={`text-[10px] font-mono ${a.urgency === "IMMEDIATE" ? "text-red-400" : a.urgency === "URGENT" ? "text-amber-400" : "text-emerald-400"}`}>{a.urgency}</span>
+                </div>
+                <p className="text-xs text-white font-medium leading-relaxed">{a.action}</p>
+                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">{a.detail}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Next echelon summary */}
+      {selectedEch && (
+        <div className="flex items-start gap-3 p-3 rounded-lg border border-slate-700/60 bg-[#050a0f]">
+          <span className="text-lg shrink-0" aria-hidden="true">{selectedEch.type === "ship" ? "⚕" : selectedEch.type === "hospital" ? "🏥" : "🏕"}</span>
+          <div>
+            <div className="text-[10px] font-mono text-slate-500 tracking-widest">DESIGNATED NEXT ECHELON OF CARE</div>
+            <div className="text-sm text-white font-bold">{selectedEch.name}</div>
+            <div className="text-xs text-slate-400">{selectedEch.role} · {selectedEch.loc} · {selectedEch.nm} nm</div>
+            <div className="text-xs text-emerald-400 mt-1">{selectedEch.assets.join("  ·  ")}</div>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ─── Calibration Panel ────────────────────────────────────────────────────────
+function CalibrationPanel({ calib, onChange }) {
+  const [tab, setTab] = useState("force");
+  const echelons = ECHELONS[calib.theater] || [];
+
+  const set = (key, sub, val) => onChange({ ...calib, [key]: { ...calib[key], [sub]: val } });
+  const setTop = (key, val) => onChange({ ...calib, [key]: val });
+
+  const tabs = [
+    { id:"force",   label:"Force Readiness" },
+    { id:"blood",   label:"Blood Supply" },
+    { id:"medevac", label:"MedEvac Assets" },
+    { id:"theater", label:"Theater & Echelon" },
+  ];
+
+  return (
+    <section aria-labelledby="calib-heading" className="bg-[#040d17] border border-cyan-900/40 rounded-xl overflow-hidden">
+      <div className="px-6 pt-5 pb-0">
+        <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
+          <h2 id="calib-heading" className="text-xs font-mono text-cyan-400 tracking-widest uppercase">⚙ Mission Calibration Settings</h2>
+          <span className="text-[10px] text-emerald-400 font-mono">● Settings auto-saved between sessions</span>
+        </div>
+        <div className="flex gap-1 border-b border-slate-800 overflow-x-auto" role="tablist">
+          {tabs.map(t => (
+            <button key={t.id} role="tab" aria-selected={tab===t.id} aria-controls={`calib-tab-${t.id}`}
+              onClick={() => setTab(t.id)}
+              className={`px-4 py-2 text-xs font-mono whitespace-nowrap border-b-2 transition-colors ${tab===t.id ? "border-cyan-500 text-cyan-300" : "border-transparent text-slate-500 hover:text-slate-300"}`}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="p-6">
+        {/* Force Readiness tab */}
+        {tab === "force" && (
+          <div id="calib-tab-force" role="tabpanel" aria-labelledby="tab-force" className="space-y-6">
+            <div>
+              <h3 className="text-[10px] font-mono text-amber-400 tracking-widest uppercase mb-3">Line-of-Duty Initial Manning (personnel)</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {Object.entries(calib.lod).map(([key, val]) => (
+                  <div key={key}>
+                    <label htmlFor={`lod-${key}`} className="block text-[10px] text-slate-500 mb-1 capitalize">{key.replace(/_/g," ")}</label>
+                    <input id={`lod-${key}`} type="number" min={0} max={2000} value={val}
+                      onChange={e => set("lod", key, Number(e.target.value))}
+                      className="w-full bg-[#0a1628] border border-slate-700 rounded px-2 py-1.5 text-sm text-white font-mono focus:outline-none focus:border-cyan-500" />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h3 className="text-[10px] font-mono text-cyan-400 tracking-widest uppercase mb-3">Minimum Viable Thresholds (%)</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {Object.entries(calib.thresholds).map(([key, val]) => (
+                  <div key={key}>
+                    <label htmlFor={`thr-${key}`} className="block text-[10px] text-slate-500 mb-1 capitalize">{key.replace(/_/g," ")}</label>
+                    <input id={`thr-${key}`} type="number" min={0} max={100} value={val}
+                      onChange={e => set("thresholds", key, Number(e.target.value))}
+                      className="w-full bg-[#0a1628] border border-slate-700 rounded px-2 py-1.5 text-sm text-white font-mono focus:outline-none focus:border-cyan-500" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Blood Supply tab */}
+        {tab === "blood" && (
+          <div id="calib-tab-blood" role="tabpanel" aria-labelledby="tab-blood" className="space-y-4">
+            <p className="text-xs text-slate-400">Set current blood product inventory (units). Alerts trigger when supply falls below casualty demand.</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {[
+                ["o_neg","O-Negative (Universal Donor)"],["a_pos","A-Positive"],["b_pos","B-Positive"],
+                ["ab_pos","AB-Positive"],["platelets","Platelets (units)"],["plasma","Fresh Frozen Plasma"],
+              ].map(([key, label]) => (
+                <div key={key} className="bg-[#050a0f] border border-slate-800 rounded-lg p-3">
+                  <label htmlFor={`blood-${key}`} className="block text-[10px] text-red-400 font-mono mb-1.5 uppercase tracking-wide">{label}</label>
+                  <input id={`blood-${key}`} type="number" min={0} max={2000} value={calib.blood[key]}
+                    onChange={e => set("blood", key, Number(e.target.value))}
+                    className="w-full bg-[#0a1628] border border-slate-700 rounded px-2 py-1.5 text-lg text-white font-mono font-bold focus:outline-none focus:border-red-500" />
+                  <div className="text-[10px] text-slate-600 mt-1">units on hand</div>
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center gap-3 p-3 rounded-lg border border-red-900/40 bg-red-900/10 text-xs text-red-300">
+              <span aria-hidden="true">⚠</span>
+              <span>O-Negative is critical — maintain minimum 80 units for MASCAL events. Current: <strong>{calib.blood.o_neg}u</strong>{calib.blood.o_neg < 80 ? " — BELOW MINIMUM" : " — OK"}</span>
+            </div>
+          </div>
+        )}
+
+        {/* MedEvac Assets tab */}
+        {tab === "medevac" && (
+          <div id="calib-tab-medevac" role="tabpanel" aria-labelledby="tab-medevac" className="space-y-4">
+            <p className="text-xs text-slate-400">Set number of available MedEvac assets by class. These are used to calculate evacuation capacity in the Recommended COA.</p>
+            <div className="space-y-3">
+              {MEDEVAC_CLASSES.map(mc => {
+                const count = calib.medevac[mc.id] || 0;
+                const catColor = mc.category === "rotary" ? "text-cyan-400" : mc.category === "fixed" ? "text-violet-400" : "text-amber-400";
+                const catLabel = mc.category === "rotary" ? "Rotary Wing" : mc.category === "fixed" ? "Fixed Wing" : "Sea Lift";
+                return (
+                  <div key={mc.id} className="flex items-center gap-4 p-3 bg-[#050a0f] border border-slate-800 rounded-lg">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm text-white font-medium">{mc.label}</div>
+                      <div className={`text-[10px] font-mono ${catColor}`}>{catLabel} · Range: {mc.range_nm} nm · Capacity: {mc.capacity} PAX</div>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <button onClick={() => set("medevac", mc.id, Math.max(0, count-1))}
+                        className="w-7 h-7 rounded border border-slate-700 text-slate-400 hover:text-white hover:border-cyan-600 transition-colors text-sm font-bold"
+                        aria-label={`Decrease ${mc.label} count`}>−</button>
+                      <span className="w-8 text-center font-mono font-bold text-white text-lg">{count}</span>
+                      <button onClick={() => set("medevac", mc.id, count+1)}
+                        className="w-7 h-7 rounded border border-slate-700 text-slate-400 hover:text-white hover:border-cyan-600 transition-colors text-sm font-bold"
+                        aria-label={`Increase ${mc.label} count`}>+</button>
+                      <span className="text-[10px] text-slate-600 w-20">cap: {count*mc.capacity} PAX</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="p-3 rounded-lg border border-cyan-900/40 bg-cyan-900/10 text-xs text-cyan-300 font-mono">
+              Total lift capacity: <strong>{MEDEVAC_CLASSES.reduce((s,mc) => s + (calib.medevac[mc.id]||0)*mc.capacity, 0)} PAX</strong> across {Object.values(calib.medevac).reduce((s,v)=>s+v,0)} platforms
+            </div>
+          </div>
+        )}
+
+        {/* Theater & Echelon tab */}
+        {tab === "theater" && (
+          <div id="calib-tab-theater" role="tabpanel" aria-labelledby="tab-theater" className="space-y-5">
+            <div>
+              <label htmlFor="theater-select" className="block text-[10px] font-mono text-cyan-400 tracking-widest uppercase mb-2">Theater of Operations</label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3">
+                {THEATERS.map(t => (
+                  <label key={t.id} className={`flex flex-col gap-1 p-3 rounded-lg border cursor-pointer transition-all ${calib.theater===t.id ? "border-cyan-600 bg-cyan-900/20" : "border-slate-800 bg-[#050a0f] hover:border-slate-700"}`}>
+                    <input type="radio" name="theater" value={t.id} checked={calib.theater===t.id} onChange={() => setTop("theater",t.id)} className="sr-only" />
+                    <span className={`text-xs font-bold ${calib.theater===t.id ? "text-cyan-300" : "text-slate-300"}`}>{t.label}</span>
+                    <span className="text-[10px] text-slate-500 leading-tight">{t.desc}</span>
+                  </label>
+                ))}
+              </div>
+              {calib.theater === "custom" && (
+                <div className="grid grid-cols-2 gap-3 mt-2">
+                  <div>
+                    <label htmlFor="custom-lat" className="block text-[10px] text-slate-500 mb-1">Latitude (decimal)</label>
+                    <input id="custom-lat" type="number" step="0.1" value={calib.customLat}
+                      onChange={e => setTop("customLat", e.target.value)}
+                      className="w-full bg-[#0a1628] border border-slate-700 rounded px-2 py-1.5 text-sm text-white font-mono focus:outline-none focus:border-cyan-500" placeholder="e.g. 26.5" />
+                  </div>
+                  <div>
+                    <label htmlFor="custom-lng" className="block text-[10px] text-slate-500 mb-1">Longitude (decimal)</label>
+                    <input id="custom-lng" type="number" step="0.1" value={calib.customLng}
+                      onChange={e => setTop("customLng", e.target.value)}
+                      className="w-full bg-[#0a1628] border border-slate-700 rounded px-2 py-1.5 text-sm text-white font-mono focus:outline-none focus:border-cyan-500" placeholder="e.g. 56.5" />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {echelons.length > 0 && (
+              <div>
+                <div className="text-[10px] font-mono text-amber-400 tracking-widest uppercase mb-3">Theater Map — Echelons of Care</div>
+                <TheaterMap
+                  theater={calib.theater}
+                  customLat={calib.customLat}
+                  customLng={calib.customLng}
+                  echelons={echelons}
+                  selectedEchelon={calib.selectedEchelon}
+                  onSelectEchelon={id => setTop("selectedEchelon", id)}
+                  carrierPos="Carrier Battle Group"
+                />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function CarrierReadiness() {
   const [selectedShip,   setSelectedShip]   = useState("cvn68");
@@ -358,7 +848,15 @@ export default function CarrierReadiness() {
   const [crewCount,      setCrewCount]      = useState(6000);
   const [threatType,     setThreatType]     = useState("drone_swarm");
   const [threatIntensity,setThreatIntensity]= useState(65);
-  const [thresholds,     setThresholds]     = useState(LOD_DEFAULTS);
+  const [showCalib,      setShowCalib]      = useState(false);
+
+  // Load persisted calibration or use defaults
+  const [calib, setCalibRaw] = useState(() => {
+    const saved = loadCalib();
+    return saved ? { ...DEFAULT_CALIB, ...saved, thresholds: { ...DEFAULT_CALIB.thresholds, ...(saved.thresholds||{}) }, lod: { ...DEFAULT_CALIB.lod, ...(saved.lod||{}) }, blood: { ...DEFAULT_CALIB.blood, ...(saved.blood||{}) }, medevac: { ...DEFAULT_MEDEVAC, ...(saved.medevac||{}) } } : DEFAULT_CALIB;
+  });
+  const setCalib = useCallback((next) => { setCalibRaw(next); saveCalib(next); }, []);
+  const thresholds = calib.thresholds;
   const [showThresholds, setShowThresholds] = useState(false);
   const [running,        setRunning]        = useState(false);
   const [result,         setResult]         = useState(null);
@@ -539,12 +1037,21 @@ export default function CarrierReadiness() {
             <div className="flex flex-col items-end gap-2">
               <span className="text-[10px] font-mono text-slate-500 tracking-widest">SOVEREIGN MESH // OrcaWolf AI</span>
               {result && <ThreatBadge level={result.threatLevel} />}
-              <button
-                onClick={() => { setShowHistory(v => !v); }}
-                className="text-xs px-3 py-1.5 rounded border border-slate-700 text-slate-400 hover:text-cyan-300 hover:border-cyan-700 transition-colors"
-              >
-                {showHistory ? "Hide" : "Show"} Mission History ({history.length})
-              </button>
+              <div className="flex gap-2 flex-wrap justify-end">
+                <button
+                  onClick={() => setShowCalib(v => !v)}
+                  className={`text-xs px-3 py-1.5 rounded border transition-colors flex items-center gap-1.5 ${showCalib ? "border-cyan-600 text-cyan-300 bg-cyan-900/20" : "border-slate-700 text-slate-400 hover:text-cyan-300 hover:border-cyan-700"}`}
+                  aria-expanded={showCalib}
+                >
+                  <span aria-hidden="true">⚙</span> Calibration Settings
+                </button>
+                <button
+                  onClick={() => setShowHistory(v => !v)}
+                  className="text-xs px-3 py-1.5 rounded border border-slate-700 text-slate-400 hover:text-cyan-300 hover:border-cyan-700 transition-colors"
+                >
+                  {showHistory ? "Hide" : "Show"} Mission History ({history.length})
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -569,6 +1076,13 @@ export default function CarrierReadiness() {
           </section>
         )}
 
+        {/* Calibration Settings Panel */}
+        {showCalib && (
+          <div id="calib-panel">
+            <CalibrationPanel calib={calib} onChange={setCalib} />
+          </div>
+        )}
+
         {/* Mission history */}
         {showHistory && (
           <section aria-labelledby="history-heading" className="bg-[#040d17] border border-cyan-900/30 rounded-xl p-6 space-y-3">
@@ -584,11 +1098,8 @@ export default function CarrierReadiness() {
         <section aria-labelledby="config-heading" className="bg-[#040d17] border border-cyan-900/30 rounded-xl p-6 space-y-6">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <h2 id="config-heading" className="text-cyan-400 font-mono font-bold text-sm tracking-widest uppercase">Exercise Configuration</h2>
-            <button
-              onClick={() => setShowThresholds(v => !v)}
-              className="text-xs px-3 py-1.5 rounded border border-slate-700 text-slate-400 hover:text-cyan-300 hover:border-cyan-700 transition-colors"
-            >
-              {showThresholds ? "Hide" : "Set"} Minimum Viable Thresholds
+            <button onClick={() => setShowCalib(v => !v)} className="text-xs px-3 py-1.5 rounded border border-slate-700 text-slate-400 hover:text-cyan-300 hover:border-cyan-700 transition-colors">
+              ⚙ Open Calibration Settings
             </button>
           </div>
 
@@ -652,25 +1163,6 @@ export default function CarrierReadiness() {
               </div>
             </div>
           </div>
-
-          {showThresholds && (
-            <div className="border-t border-slate-800 pt-5">
-              <p className="text-xs text-slate-400 mb-4">Set minimum viable thresholds (%) — alerts trigger when readiness falls below these levels.</p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                {Object.entries(thresholds).map(([key, val]) => (
-                  <div key={key}>
-                    <label htmlFor={`thr-${key}`} className="block text-[10px] text-slate-500 mb-1 capitalize">{key.replace(/_/g," ")}</label>
-                    <div className="flex items-center gap-2">
-                      <input id={`thr-${key}`} type="number" min={0} max={100} value={val}
-                        onChange={e => setThresholds(t => ({ ...t, [key]: Number(e.target.value) }))}
-                        className="w-16 bg-[#0a1628] border border-slate-700 rounded px-2 py-1 text-xs text-white font-mono focus:outline-none focus:border-cyan-500" />
-                      <span className="text-xs text-slate-600">%</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
           <div className="flex justify-center pt-2">
             <button onClick={handleRun} disabled={running}
@@ -838,6 +1330,18 @@ export default function CarrierReadiness() {
                 )}
               </div>
             </section>
+
+            {/* Recommended Course of Action */}
+            <RecommendedCOA
+              result={result}
+              result2={result2}
+              threatType={threatType}
+              threatIntensity={threatIntensity}
+              calib={calib}
+              ship1={ship1}
+              ship2={ship2}
+              showBothShips={showBothShips}
+            />
 
             <div className="flex justify-center">
               <button onClick={() => { setResult(null); setResult2(null); setLogIdx(0); setSaveMsg(""); }}
