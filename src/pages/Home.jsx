@@ -65,8 +65,8 @@ function EcosystemImage() {
       <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-cyan-400/20 via-blue-500/10 to-cyan-400/20 blur-xl opacity-60 group-hover:opacity-90 transition-opacity duration-700 pointer-events-none" aria-hidden="true" />
       {/* Image */}
       <img
-        src="/static/gen_orcawolf-ecosystem-hero-v2-e97fb7.webp"
-        alt="OrcaWolf AI sovereign mesh ecosystem — USS Nimitz and USS Theodore Roosevelt carrier strike groups, USNS Mercy hospital ship, and Kuwait coalition hospital connected via StarShield satellite mesh telemetry arcs"
+        src="/static/gen_orcawolfai-ecosystem-hero-39ada8.webp"
+        alt="OrcaWolf AI sovereign mesh ecosystem — StarShield satellite constellation connecting two US Navy carriers, USNS Mercy hospital ship, and Kuwait coalition hospital via cyan mesh telemetry arcs"
         className="relative w-full rounded-2xl border border-cyan-400/20 shadow-[0_0_80px_rgba(0,229,255,0.15)] object-cover"
         style={{ maxHeight: "520px" }}
       />
