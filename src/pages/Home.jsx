@@ -15,6 +15,7 @@ const PILLARS = [
     color: "text-cyan-400",
     bg: "bg-cyan-400/10",
     border: "border-cyan-400/20",
+    guide: "/OrcaWolfAI-UserGuide.html#pillar-mtls",
   },
   {
     icon: NetworkIcon,
@@ -23,6 +24,7 @@ const PILLARS = [
     color: "text-wolf-300",
     bg: "bg-wolf-400/10",
     border: "border-wolf-400/20",
+    guide: "/OrcaWolfAI-UserGuide.html#pillar-ambient-mesh",
   },
   {
     icon: ActivityIcon,
@@ -31,6 +33,7 @@ const PILLARS = [
     color: "text-emerald-400",
     bg: "bg-emerald-400/10",
     border: "border-emerald-400/20",
+    guide: "/OrcaWolfAI-UserGuide.html#pillar-mci",
   },
   {
     icon: ZapIcon,
@@ -39,6 +42,7 @@ const PILLARS = [
     color: "text-amber-400",
     bg: "bg-amber-400/10",
     border: "border-amber-400/20",
+    guide: "/OrcaWolfAI-UserGuide.html#pillar-google-ai",
   },
   {
     icon: LockIcon,
@@ -47,6 +51,7 @@ const PILLARS = [
     color: "text-violet-400",
     bg: "bg-violet-400/10",
     border: "border-violet-400/20",
+    guide: "/OrcaWolfAI-UserGuide.html#pillar-sovereign-data",
   },
   {
     icon: LayersIcon,
@@ -55,6 +60,7 @@ const PILLARS = [
     color: "text-rose-400",
     bg: "bg-rose-400/10",
     border: "border-rose-400/20",
+    guide: "/OrcaWolfAI-UserGuide.html#pillar-ehr-interop",
   },
 ];
 
@@ -188,7 +194,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {PILLARS.map(({ icon: Icon, label, desc, color, bg, border }, i) => (
+            {PILLARS.map(({ icon: Icon, label, desc, color, bg, border, guide }, i) => (
               <article
                 key={label}
                 className={`gradient-border rounded-xl p-6 flex flex-col gap-4 ${bg} border ${border} hover:scale-[1.02] transition-transform duration-200`}
@@ -199,6 +205,16 @@ export default function Home() {
                 </div>
                 <h3 className={`font-semibold text-white text-lg`}>{label}</h3>
                 <p className="text-slate-400 text-sm leading-relaxed">{desc}</p>
+                <a
+                  href={guide}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`mt-auto inline-flex items-center gap-1 text-xs font-semibold ${color} hover:underline underline-offset-2 transition-opacity opacity-80 hover:opacity-100`}
+                  aria-label={`Read about ${label} in the User Guide`}
+                >
+                  Read in User Guide
+                  <span aria-hidden="true">→</span>
+                </a>
               </article>
             ))}
           </div>

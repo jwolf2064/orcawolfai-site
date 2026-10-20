@@ -627,31 +627,31 @@
   <h2 class="section-title">Home Page — Technology Pillars Explained</h2>
   <p class="lead">The six pillars on the OrcaWolf AI home page represent the foundational technology decisions that underpin the entire sovereign mesh architecture. Each is a deliberate design choice, not a product feature.</p>
 
-  <h3 class="subsection-title">2.1 Zero-Trust mTLS</h3>
+  <h3 class="subsection-title" id="pillar-mtls">2.1 Zero-Trust mTLS</h3>
   <p><strong>What it means:</strong> Mutual Transport Layer Security (mTLS) requires <em>both</em> sides of every network connection to prove their identity using cryptographic certificates before any data is exchanged. Unlike standard TLS — where only the server proves its identity to the client — mTLS eliminates the concept of implicit internal trust entirely.</p>
   <p><strong>Why it matters for EHR:</strong> Traditional hospital networks assume that anything inside the firewall is trustworthy. A single compromised workstation can then move laterally to reach every patient record. mTLS means a compromised pod cannot communicate with any other service without a valid, recently-issued certificate — and that certificate is cryptographically bound to a specific workload identity, not a shared secret or password.</p>
   <p><strong>How it works in OrcaWolf AI:</strong> Certificate rotation is automatic and happens every few hours via cert-manager integrated with the SPIRE identity server. No human ever touches a private key in production. If a service's certificate expires or is revoked, it immediately loses the ability to communicate — zero administrative action required.</p>
 
-  <h3 class="subsection-title">2.2 Ambient Mesh / ztunnel</h3>
+  <h3 class="subsection-title" id="pillar-ambient-mesh">2.2 Ambient Mesh / ztunnel</h3>
   <p><strong>What it means:</strong> Istio Ambient Mesh is a next-generation service mesh architecture that removes the requirement for a sidecar proxy in every pod. Instead, a single ztunnel (zero-trust tunnel) agent runs on each Kubernetes node and handles all inter-pod traffic transparently.</p>
   <p><strong>Why it matters:</strong> Traditional sidecar meshes add 15–30% memory overhead per pod and require pod restarts to update mesh configuration. At the scale of a hospital EHR system — potentially thousands of pods — this becomes operationally untenable. Ambient Mesh reduces mesh overhead by up to 70% while maintaining identical security guarantees.</p>
   <p><strong>HBONE tunneling:</strong> All traffic between nodes flows through HBONE (HTTP-Based Overlay Network Encapsulation) tunnels — encrypted, authenticated, and policy-enforced at the kernel level before any application code runs.</p>
 
-  <h3 class="subsection-title">2.3 Mass Casualty Simulation</h3>
+  <h3 class="subsection-title" id="pillar-mci">2.3 Mass Casualty Simulation</h3>
   <p><strong>What it means:</strong> The MCI Simulation module provides a configurable, AI-driven triage and resource allocation engine for Mass Casualty Incidents. Casualty distributions, resource consumption, and event timelines are generated using probability weights derived from published military medical doctrine.</p>
   <p><strong>Underlying standards:</strong> NATO STANAG 2122 casualty estimation tables, US Joint Trauma System Clinical Practice Guidelines (JTS CPG), and TCCC (Tactical Combat Casualty Care) field statistics.</p>
   <p><strong>FHIR R4 output:</strong> Every simulation run generates a fully-formed FHIR R4 Bundle — real clinical resources (Patient, Condition, Observation) in the format required by modern health information exchanges. These bundles can be fed directly into production ingestion pipelines.</p>
 
-  <h3 class="subsection-title">2.4 Google AI Suite</h3>
+  <h3 class="subsection-title" id="pillar-google-ai">2.4 Google AI Suite</h3>
   <p><strong>What it means:</strong> The platform integrates Vertex AI (Google's managed ML platform), BigQuery (petabyte-scale analytics), Gemini (Google's frontier reasoning model), and Cloud Healthcare API — all operating within the sovereign mesh perimeter.</p>
   <p><strong>Key capability — Vertex AI text-embedding-004:</strong> Clinical text summaries from FHIR resources are converted to 768-dimensional semantic vectors using Google's text embedding model. These vectors enable cosine similarity search — finding the most clinically relevant past cases for a given presentation without exposing raw PHI.</p>
   <p><strong>Sovereign boundary:</strong> All AI inference calls remain within VPC-SC perimeters. The AI never receives raw PHI — only de-identified or synthetic clinical summaries.</p>
 
-  <h3 class="subsection-title">2.5 Sovereign Data</h3>
+  <h3 class="subsection-title" id="pillar-sovereign-data">2.5 Sovereign Data</h3>
   <p><strong>What it means:</strong> Every patient record in the OrcaWolf AI architecture is encrypted with Customer-Managed Encryption Keys (CMEK) held in Cloud KMS — not by Google, not by a third party, but by the owning organisation. Data residency is guaranteed by VPC Service Controls that prevent exfiltration even if a cloud identity is compromised.</p>
   <p><strong>Provenance ledger:</strong> Every read, write, transform, and export event is recorded in an immutable audit chain, with each entry signed by the workload's cryptographic identity. This satisfies HIPAA audit requirements natively — no bolted-on compliance tools required.</p>
 
-  <h3 class="subsection-title">2.6 EHR Interop Layer</h3>
+  <h3 class="subsection-title" id="pillar-ehr-interop">2.6 EHR Interop Layer</h3>
   <p><strong>What it means:</strong> The interoperability layer bridges the two dominant healthcare data standards — FHIR R4 (the modern REST-based standard) and HL7 v2.x (the legacy message-based standard still used by 90% of hospitals worldwide) — without requiring either side to change.</p>
   <p><strong>US Core Implementation Guide:</strong> All FHIR resources are profiled against US Core IG to ensure compatibility with US healthcare information exchanges and federal reporting requirements.</p>
   <p><strong>De-identification pipeline:</strong> Before any data reaches an AI workload, it passes through the Cloud Healthcare API de-identification engine, producing Safe Harbor or Expert Determination compliant datasets automatically.</p>
