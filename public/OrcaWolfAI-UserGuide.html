@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OrcaWolf AI — Comprehensive User Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Source Sans 3', Arial, sans-serif;
+    font-size: 11pt;
+    color: #1a1a2e;
+    background: #f5f5f5;
+    line-height: 1.7;
+  }
+
+  .page {
+    max-width: 8.5in;
+    margin: 0 auto;
+    background: white;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.15);
+  }
+
+  /* Cover page */
+  .cover {
+    min-height: 11in;
+    background: linear-gradient(160deg, #050a0f 0%, #0a1628 60%, #001a33 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 60px;
+    text-align: center;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,229,255,0.1);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .cover::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,229,255,0.15);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .cover-badge {
+    display: inline-block;
+    border: 1px solid rgba(0,229,255,0.4);
+    color: #00e5ff;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 9pt;
+    letter-spacing: 3px;
+    padding: 6px 18px;
+    border-radius: 100px;
+    margin-bottom: 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cover h1 {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 42pt;
+    font-weight: 700;
+    color: white;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cover h1 span { color: #00e5ff; }
+
+  .cover .subtitle {
+    font-size: 14pt;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 48px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cover-meta {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 32px;
+    width: 100%;
+  }
+
+  .cover-meta table { width: 100%; border-collapse: collapse; }
+  .cover-meta td { padding: 4px 16px; color: rgba(255,255,255,0.5); font-size: 9pt; font-family: 'Source Code Pro', monospace; }
+  .cover-meta td:first-child { color: #00e5ff; text-align: right; width: 50%; border-right: 1px solid rgba(255,255,255,0.15); }
+  .cover-meta td:last-child { text-align: left; }
+
+  .unclass-banner {
+    background: #e8f5e9;
+    border-top: 4px solid #2e7d32;
+    border-bottom: 4px solid #2e7d32;
+    text-align: center;
+    padding: 10px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 10pt;
+    font-weight: 600;
+    color: #1b5e20;
+    letter-spacing: 2px;
+  }
+
+  /* Body content */
+  .body-content {
+    padding: 0.75in 1in;
+  }
+
+  /* Running header */
+  .running-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 1in;
+    border-bottom: 2px solid #00e5ff;
+    background: #050a0f;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .running-header .brand {
+    font-family: 'Source Code Pro', monospace;
+    color: #00e5ff;
+    font-size: 9pt;
+    letter-spacing: 2px;
+  }
+
+  .running-header .doc-title {
+    color: rgba(255,255,255,0.5);
+    font-size: 8pt;
+    font-family: 'Source Code Pro', monospace;
+  }
+
+  /* TOC */
+  .toc {
+    padding: 60px 1in;
+    page-break-after: always;
+    min-height: 6in;
+  }
+
+  .toc h2 {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 22pt;
+    color: #050a0f;
+    margin-bottom: 8px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid #00e5ff;
+  }
+
+  .toc-section { margin-top: 32px; }
+
+  .toc-section h3 {
+    font-size: 10pt;
+    color: #6b7280;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: 'Source Code Pro', monospace;
+    margin-bottom: 12px;
+  }
+
+  .toc-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 6px 0;
+    border-bottom: 1px dotted #e5e7eb;
+    text-decoration: none;
+    color: #1a1a2e;
+  }
+
+  .toc-item:hover { color: #00e5ff; }
+  .toc-item .toc-num { color: #00e5ff; font-family: 'Source Code Pro', monospace; font-size: 9pt; font-weight: 600; margin-right: 12px; }
+  .toc-item .toc-page { color: #9ca3af; font-family: 'Source Code Pro', monospace; font-size: 9pt; }
+  .toc-sub { padding-left: 24px; font-size: 10pt; color: #4b5563; }
+
+  /* Section headers */
+  .section {
+    padding: 48px 0 32px;
+    border-top: 3px solid #f3f4f6;
+    margin-top: 48px;
+  }
+
+  .section:first-child { border-top: none; margin-top: 0; padding-top: 0; }
+
+  .section-badge {
+    display: inline-block;
+    background: #050a0f;
+    color: #00e5ff;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 8pt;
+    letter-spacing: 2px;
+    padding: 3px 10px;
+    border-radius: 3px;
+    margin-bottom: 12px;
+  }
+
+  h2.section-title {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 24pt;
+    color: #050a0f;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+
+  h3.subsection-title {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 14pt;
+    color: #1a1a2e;
+    margin: 28px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #e0f7ff;
+  }
+
+  h4.sub-subsection {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #374151;
+    margin: 20px 0 8px;
+  }
+
+  .lead {
+    font-size: 12pt;
+    color: #4b5563;
+    line-height: 1.8;
+    margin-bottom: 24px;
+    font-style: italic;
+    border-left: 4px solid #00e5ff;
+    padding-left: 16px;
+  }
+
+  p { margin-bottom: 14px; color: #374151; line-height: 1.8; }
+
+  /* Info boxes */
+  .info-box {
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin: 20px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .info-box.blue { background: #eff6ff; border-left: 4px solid #3b82f6; }
+  .info-box.green { background: #f0fdf4; border-left: 4px solid #22c55e; }
+  .info-box.amber { background: #fffbeb; border-left: 4px solid #f59e0b; }
+  .info-box.cyan { background: #ecfeff; border-left: 4px solid #06b6d4; }
+  .info-box.red { background: #fef2f2; border-left: 4px solid #ef4444; }
+
+  .info-box .icon { font-size: 18pt; line-height: 1; flex-shrink: 0; }
+  .info-box .content { flex: 1; }
+  .info-box .content strong { display: block; margin-bottom: 4px; font-size: 10pt; }
+  .info-box .content p { margin: 0; font-size: 10pt; }
+
+  /* Tables */
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 10pt;
+  }
+
+  table.data-table th {
+    background: #050a0f;
+    color: #00e5ff;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 8pt;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+  }
+
+  table.data-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #374151;
+    vertical-align: top;
+  }
+
+  table.data-table tr:nth-child(even) td { background: #f9fafb; }
+  table.data-table tr:hover td { background: #ecfeff; }
+
+  /* Code blocks */
+  .code-block {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 9pt;
+    color: #e6edf3;
+    overflow-x: auto;
+    line-height: 1.6;
+  }
+
+  .code-block .comment { color: #8b949e; }
+  .code-block .keyword { color: #ff7b72; }
+  .code-block .string { color: #a5d6ff; }
+  .code-block .number { color: #79c0ff; }
+
+  /* Step lists */
+  .step-list { list-style: none; margin: 16px 0; }
+  .step-list li {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 14px;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: #050a0f;
+    color: #00e5ff;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 9pt;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-content { flex: 1; }
+  .step-content strong { color: #1a1a2e; display: block; margin-bottom: 3px; }
+  .step-content p { margin: 0; font-size: 10pt; }
+
+  /* Feature grid */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .feature-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    background: #fafafa;
+  }
+
+  .feature-card .fc-badge {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 7pt;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 100px;
+    margin-bottom: 8px;
+    display: inline-block;
+  }
+
+  .fc-cyan { background: #ecfeff; color: #0891b2; }
+  .fc-green { background: #f0fdf4; color: #16a34a; }
+  .fc-amber { background: #fffbeb; color: #d97706; }
+  .fc-violet { background: #f5f3ff; color: #7c3aed; }
+  .fc-rose { background: #fff1f2; color: #e11d48; }
+  .fc-blue { background: #eff6ff; color: #2563eb; }
+
+  .feature-card h4 { font-size: 11pt; color: #1a1a2e; margin-bottom: 6px; }
+  .feature-card p { font-size: 9pt; color: #6b7280; margin: 0; line-height: 1.6; }
+
+  /* Layer cards */
+  .layer-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    margin: 16px 0;
+    overflow: hidden;
+  }
+
+  .layer-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    background: #050a0f;
+  }
+
+  .layer-badge {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 9pt;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .layer-header h4 { color: white; font-size: 11pt; margin: 0; flex: 1; }
+  .layer-header .layer-tag { font-family: 'Source Code Pro', monospace; font-size: 8pt; color: rgba(255,255,255,0.4); }
+
+  .layer-body { padding: 16px 18px; }
+  .layer-body p { font-size: 10pt; margin-bottom: 10px; }
+
+  .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .tag {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 7pt;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(0,229,255,0.3);
+    color: #0891b2;
+    background: #ecfeff;
+  }
+
+  /* Glossary */
+  .glossary-item {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f4f6;
+    align-items: baseline;
+  }
+
+  .glossary-term {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 9pt;
+    font-weight: 600;
+    color: #0891b2;
+  }
+
+  .glossary-def { font-size: 10pt; color: #374151; }
+
+  /* Print */
+  @media print {
+    .running-header { position: static; }
+    .section { page-break-inside: avoid; }
+    .layer-card { page-break-inside: avoid; }
+  }
+
+  /* Utilities */
+  ul.bullet-list { padding-left: 20px; margin: 12px 0; }
+  ul.bullet-list li { margin-bottom: 6px; font-size: 10pt; color: #374151; }
+  ol.num-list { padding-left: 20px; margin: 12px 0; }
+  ol.num-list li { margin-bottom: 6px; font-size: 10pt; color: #374151; }
+
+  .divider { height: 1px; background: linear-gradient(90deg, transparent, #00e5ff, transparent); margin: 40px 0; }
+
+  .page-num {
+    text-align: center;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 8pt;
+    color: #9ca3af;
+    padding: 24px 0;
+    border-top: 1px solid #f3f4f6;
+    margin-top: 48px;
+  }
+
+  .print-btn {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    background: #050a0f;
+    color: #00e5ff;
+    border: 1px solid rgba(0,229,255,0.4);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 10pt;
+    cursor: pointer;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 20px rgba(0,229,255,0.2);
+  }
+
+  .print-btn:hover { background: #0a1628; }
+
+  @media print { .print-btn { display: none; } }
+</style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">⎙ Print / Save as PDF</button>
+
+<!-- COVER PAGE -->
+<div class="page">
+<div class="cover">
+  <div class="cover-badge">UNCLASSIFIED // FOR DEMONSTRATION USE ONLY</div>
+  <h1>OrcaWolf <span>AI</span></h1>
+  <div class="subtitle">Sovereign Mesh &amp; Off-Grid AI EHR Infrastructure<br>Comprehensive User &amp; Technical Reference Guide</div>
+  <div class="cover-meta">
+    <table>
+      <tr><td>Document Version</td><td>1.0 — October 2026</td></tr>
+      <tr><td>Classification</td><td>UNCLASSIFIED // FOR DEMONSTRATION USE ONLY</td></tr>
+      <tr><td>Author</td><td>J. Wolf — OrcaWolf AI</td></tr>
+      <tr><td>Website</td><td>www.orcawolfai.com</td></tr>
+      <tr><td>GitHub Repository</td><td>github.com/jwolf2064/orcawolfai-site</td></tr>
+      <tr><td>Architecture Standard</td><td>NATO STANAG 2122 · JTS CPG · FHIR R4 · HL7 v2</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- UNCLASSIFIED BANNER -->
+<div class="unclass-banner">UNCLASSIFIED // FOR DEMONSTRATION AND EXERCISE USE ONLY — NOT FOR OPERATIONAL DEPLOYMENT</div>
+
+<!-- RUNNING HEADER -->
+<div class="running-header">
+  <div class="brand">ORCAWOLF AI // SOVEREIGN MESH</div>
+  <div class="doc-title">COMPREHENSIVE USER GUIDE v1.0 — OCTOBER 2026</div>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc">
+  <h2>Table of Contents</h2>
+
+  <div class="toc-section">
+    <h3>Introduction</h3>
+    <a class="toc-item" href="#section-overview"><span><span class="toc-num">1</span> Platform Overview &amp; Mission</span><span class="toc-page">4</span></a>
+    <a class="toc-item toc-sub" href="#section-naming">1.1 The OrcaWolf Name</a>
+    <a class="toc-item toc-sub" href="#section-audience">1.2 Intended Audience</a>
+    <a class="toc-item toc-sub" href="#section-disclaimer">1.3 Demonstration Disclaimer</a>
+  </div>
+
+  <div class="toc-section">
+    <h3>Core Technology</h3>
+    <a class="toc-item" href="#section-splash"><span><span class="toc-num">2</span> Home Page — Technology Pillars Explained</span><span class="toc-page">5</span></a>
+    <a class="toc-item" href="#section-architecture"><span><span class="toc-num">3</span> Architecture — The Six-Layer Sovereign Stack</span><span class="toc-page">7</span></a>
+    <a class="toc-item toc-sub" href="#layer-l0">3.1 L0 — Physical / Cloud Substrate</a>
+    <a class="toc-item toc-sub" href="#layer-l1">3.2 L1 — Ambient Mesh / ztunnel</a>
+    <a class="toc-item toc-sub" href="#layer-l2">3.3 L2 — Zero-Trust Identity</a>
+    <a class="toc-item toc-sub" href="#layer-l3">3.4 L3 — EHR Interop &amp; Data Sovereignty</a>
+    <a class="toc-item toc-sub" href="#layer-l4">3.5 L4 — AI Inference &amp; Analytics</a>
+    <a class="toc-item toc-sub" href="#layer-l5">3.6 L5 — Observability &amp; Compliance</a>
+  </div>
+
+  <div class="toc-section">
+    <h3>Simulation Tools</h3>
+    <a class="toc-item" href="#section-mci"><span><span class="toc-num">4</span> Mass Casualty Incident (MCI) Simulation</span><span class="toc-page">12</span></a>
+    <a class="toc-item" href="#section-carrier"><span><span class="toc-num">5</span> Carrier Readiness &amp; C2 Dashboard</span><span class="toc-page">14</span></a>
+    <a class="toc-item" href="#section-meshc2"><span><span class="toc-num">6</span> Sovereign Mesh C2 — NATS JetStream Dashboard</span><span class="toc-page">17</span></a>
+    <a class="toc-item" href="#section-hammer"><span><span class="toc-num">7</span> Combat Medic Load Hammer</span><span class="toc-page">18</span></a>
+  </div>
+
+  <div class="toc-section">
+    <h3>Platform &amp; Administration</h3>
+    <a class="toc-item" href="#section-innovation"><span><span class="toc-num">8</span> Innovation Lab</span><span class="toc-page">19</span></a>
+    <a class="toc-item" href="#section-contact"><span><span class="toc-num">9</span> Contact &amp; Enquiry Management</span><span class="toc-page">20</span></a>
+    <a class="toc-item" href="#section-admin"><span><span class="toc-num">10</span> Admin Dashboard</span><span class="toc-page">20</span></a>
+    <a class="toc-item" href="#section-github"><span><span class="toc-num">11</span> GitHub Integration &amp; Source Code Access</span><span class="toc-page">21</span></a>
+    <a class="toc-item" href="#section-data"><span><span class="toc-num">12</span> Data Sources &amp; Methodology</span><span class="toc-page">21</span></a>
+    <a class="toc-item" href="#section-glossary"><span><span class="toc-num">13</span> Glossary of Terms</span><span class="toc-page">22</span></a>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="body-content">
+
+<!-- SECTION 1: OVERVIEW -->
+<div class="section" id="section-overview">
+  <div class="section-badge">SECTION 01</div>
+  <h2 class="section-title">Platform Overview &amp; Mission</h2>
+  <p class="lead">OrcaWolf AI is an architecture demonstrator for sovereign, AI-native Electronic Health Record (EHR) infrastructure — built to show what is possible when zero-trust networking, cryptographic identity, and clinical AI are designed as a unified system from the ground up.</p>
+
+  <p>Healthcare data is among the most sensitive information that exists. Yet most EHR infrastructure was designed before the internet became adversarial, before AI was a first-class clinical participant, and long before regulators demanded cryptographic proof of data lineage. OrcaWolf AI exists to close that gap — demonstrating a complete reference architecture that is sovereign, resilient, and verifiable at every layer.</p>
+
+  <p>The platform serves three communities simultaneously:</p>
+  <ul class="bullet-list">
+    <li><strong>Defence medical planners</strong> — through naval carrier readiness simulation, mass casualty triage modeling, and C2 dashboard telemetry</li>
+    <li><strong>Healthcare technology architects</strong> — through a detailed six-layer sovereign mesh reference architecture with interactive 3D visualizations</li>
+    <li><strong>AI and cloud engineers</strong> — through Vertex AI vector pipeline integration, FHIR R4 bundle generation, and load testing simulation</li>
+  </ul>
+
+  <h3 class="subsection-title" id="section-naming">1.1 The OrcaWolf Name</h3>
+  <p>The name reflects the architecture's character. The <strong>orca</strong> represents disciplined, coordinated pack intelligence — highly organised, mission-focused, operating as a unified system. The <strong>wolf</strong> represents zero-trust instinct — nothing passes without being vouched for. Together they describe a system that is both intelligent and uncompromising in its security posture.</p>
+
+  <h3 class="subsection-title" id="section-audience">1.2 Intended Audience</h3>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="fc-badge fc-cyan">Primary</div>
+      <h4>Defence Medical Officers &amp; C2 Commanders</h4>
+      <p>Naval medical department heads, MCI planners, line-of-duty readiness coordinators, and fleet commanders evaluating AI-assisted medical C2 tooling.</p>
+    </div>
+    <div class="feature-card">
+      <div class="fc-badge fc-violet">Technical</div>
+      <h4>Healthcare IT Architects &amp; Cloud Engineers</h4>
+      <p>Solution architects designing sovereign EHR infrastructure on GKE, Istio Ambient Mesh, and Google Cloud AI services.</p>
+    </div>
+    <div class="feature-card">
+      <div class="fc-badge fc-green">Evaluation</div>
+      <h4>Programme Evaluators &amp; Procurement Officers</h4>
+      <p>JOMIS evaluators, DoD health IT programme managers, and government procurement authorities assessing sovereign mesh capabilities.</p>
+    </div>
+    <div class="feature-card">
+      <div class="fc-badge fc-amber">Research</div>
+      <h4>Clinical Informatics Researchers</h4>
+      <p>FHIR R4 integration specialists, federated learning researchers, and clinical AI developers building on the mesh platform.</p>
+    </div>
+  </div>
+
+  <h3 class="subsection-title" id="section-disclaimer">1.3 Demonstration Disclaimer</h3>
+  <div class="info-box amber">
+    <div class="icon">⚠</div>
+    <div class="content">
+      <strong>UNCLASSIFIED // FOR DEMONSTRATION AND EXERCISE USE ONLY</strong>
+      <p>All simulations, casualty figures, readiness metrics, and event data on this platform are synthetically generated for demonstration and training purposes only. No real patient data, classified operational data, or live military telemetry is used or stored. This platform is not approved for operational deployment without formal security assessment and authority to operate (ATO).</p>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- SECTION 2: SPLASH PAGE TECHNOLOGIES -->
+<div class="section" id="section-splash">
+  <div class="section-badge">SECTION 02</div>
+  <h2 class="section-title">Home Page — Technology Pillars Explained</h2>
+  <p class="lead">The six pillars on the OrcaWolf AI home page represent the foundational technology decisions that underpin the entire sovereign mesh architecture. Each is a deliberate design choice, not a product feature.</p>
+
+  <h3 class="subsection-title">2.1 Zero-Trust mTLS</h3>
+  <p><strong>What it means:</strong> Mutual Transport Layer Security (mTLS) requires <em>both</em> sides of every network connection to prove their identity using cryptographic certificates before any data is exchanged. Unlike standard TLS — where only the server proves its identity to the client — mTLS eliminates the concept of implicit internal trust entirely.</p>
+  <p><strong>Why it matters for EHR:</strong> Traditional hospital networks assume that anything inside the firewall is trustworthy. A single compromised workstation can then move laterally to reach every patient record. mTLS means a compromised pod cannot communicate with any other service without a valid, recently-issued certificate — and that certificate is cryptographically bound to a specific workload identity, not a shared secret or password.</p>
+  <p><strong>How it works in OrcaWolf AI:</strong> Certificate rotation is automatic and happens every few hours via cert-manager integrated with the SPIRE identity server. No human ever touches a private key in production. If a service's certificate expires or is revoked, it immediately loses the ability to communicate — zero administrative action required.</p>
+
+  <h3 class="subsection-title">2.2 Ambient Mesh / ztunnel</h3>
+  <p><strong>What it means:</strong> Istio Ambient Mesh is a next-generation service mesh architecture that removes the requirement for a sidecar proxy in every pod. Instead, a single ztunnel (zero-trust tunnel) agent runs on each Kubernetes node and handles all inter-pod traffic transparently.</p>
+  <p><strong>Why it matters:</strong> Traditional sidecar meshes add 15–30% memory overhead per pod and require pod restarts to update mesh configuration. At the scale of a hospital EHR system — potentially thousands of pods — this becomes operationally untenable. Ambient Mesh reduces mesh overhead by up to 70% while maintaining identical security guarantees.</p>
+  <p><strong>HBONE tunneling:</strong> All traffic between nodes flows through HBONE (HTTP-Based Overlay Network Encapsulation) tunnels — encrypted, authenticated, and policy-enforced at the kernel level before any application code runs.</p>
+
+  <h3 class="subsection-title">2.3 Mass Casualty Simulation</h3>
+  <p><strong>What it means:</strong> The MCI Simulation module provides a configurable, AI-driven triage and resource allocation engine for Mass Casualty Incidents. Casualty distributions, resource consumption, and event timelines are generated using probability weights derived from published military medical doctrine.</p>
+  <p><strong>Underlying standards:</strong> NATO STANAG 2122 casualty estimation tables, US Joint Trauma System Clinical Practice Guidelines (JTS CPG), and TCCC (Tactical Combat Casualty Care) field statistics.</p>
+  <p><strong>FHIR R4 output:</strong> Every simulation run generates a fully-formed FHIR R4 Bundle — real clinical resources (Patient, Condition, Observation) in the format required by modern health information exchanges. These bundles can be fed directly into production ingestion pipelines.</p>
+
+  <h3 class="subsection-title">2.4 Google AI Suite</h3>
+  <p><strong>What it means:</strong> The platform integrates Vertex AI (Google's managed ML platform), BigQuery (petabyte-scale analytics), Gemini (Google's frontier reasoning model), and Cloud Healthcare API — all operating within the sovereign mesh perimeter.</p>
+  <p><strong>Key capability — Vertex AI text-embedding-004:</strong> Clinical text summaries from FHIR resources are converted to 768-dimensional semantic vectors using Google's text embedding model. These vectors enable cosine similarity search — finding the most clinically relevant past cases for a given presentation without exposing raw PHI.</p>
+  <p><strong>Sovereign boundary:</strong> All AI inference calls remain within VPC-SC perimeters. The AI never receives raw PHI — only de-identified or synthetic clinical summaries.</p>
+
+  <h3 class="subsection-title">2.5 Sovereign Data</h3>
+  <p><strong>What it means:</strong> Every patient record in the OrcaWolf AI architecture is encrypted with Customer-Managed Encryption Keys (CMEK) held in Cloud KMS — not by Google, not by a third party, but by the owning organisation. Data residency is guaranteed by VPC Service Controls that prevent exfiltration even if a cloud identity is compromised.</p>
+  <p><strong>Provenance ledger:</strong> Every read, write, transform, and export event is recorded in an immutable audit chain, with each entry signed by the workload's cryptographic identity. This satisfies HIPAA audit requirements natively — no bolted-on compliance tools required.</p>
+
+  <h3 class="subsection-title">2.6 EHR Interop Layer</h3>
+  <p><strong>What it means:</strong> The interoperability layer bridges the two dominant healthcare data standards — FHIR R4 (the modern REST-based standard) and HL7 v2.x (the legacy message-based standard still used by 90% of hospitals worldwide) — without requiring either side to change.</p>
+  <p><strong>US Core Implementation Guide:</strong> All FHIR resources are profiled against US Core IG to ensure compatibility with US healthcare information exchanges and federal reporting requirements.</p>
+  <p><strong>De-identification pipeline:</strong> Before any data reaches an AI workload, it passes through the Cloud Healthcare API de-identification engine, producing Safe Harbor or Expert Determination compliant datasets automatically.</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- SECTION 3: ARCHITECTURE -->
+<div class="section" id="section-architecture">
+  <div class="section-badge">SECTION 03</div>
+  <h2 class="section-title">Architecture — The Six-Layer Sovereign Stack</h2>
+  <p class="lead">The OrcaWolf AI architecture is organised as a six-layer trust hierarchy — L0 through L5 — where each layer derives its security guarantees from the layer below it. Trust is never assumed; it is always cryptographically proven and flows upward from hardware.</p>
+
+  <div class="info-box cyan">
+    <div class="icon">ℹ</div>
+    <div class="content">
+      <strong>Interactive Walkthrough Available</strong>
+      <p>The Architecture page on the site includes a layer-by-layer interactive walkthrough with 3D visualisations. Click "Start Layer-by-Layer Walkthrough" to explore each layer in detail with animated trust-flow indicators.</p>
+    </div>
+  </div>
+
+  <!-- L0 -->
+  <div class="layer-card" id="layer-l0">
+    <div class="layer-header">
+      <span class="layer-badge" style="background:#94a3b8;color:#0f172a;">L0</span>
+      <h4>Physical / Cloud Substrate</h4>
+      <span class="layer-tag">INFRASTRUCTURE ANCHOR</span>
+    </div>
+    <div class="layer-body">
+      <p>The foundation of the entire sovereign mesh begins at the physical and cloud infrastructure layer — where hardware meets policy. OrcaWolf AI runs on <strong>Google Kubernetes Engine (GKE) Autopilot</strong> clusters provisioned with <strong>Confidential Computing nodes</strong>, meaning the CPU itself encrypts data in use — not just at rest or in transit. Even the cloud provider cannot read workload memory.</p>
+      <p>Every storage volume is encrypted using <strong>Customer-Managed Encryption Keys (CMEK)</strong> held in Cloud KMS, giving the organisation — not Google — the authority to revoke access instantly. <strong>VPC Service Controls</strong> wrap the entire environment in a logical perimeter that prevents data exfiltration even if an identity is compromised inside the cluster.</p>
+      <p>Every node in the cluster attests its integrity through <strong>Shielded VM measured boot</strong>, and the resulting attestation is fed into the SPIRE trust root at L2. The physical layer is the anchor; every higher layer derives its trustworthiness from what is established here.</p>
+      <div class="tag-list">
+        <span class="tag">GKE Autopilot</span>
+        <span class="tag">Confidential VMs</span>
+        <span class="tag">Cloud KMS (CMEK)</span>
+        <span class="tag">VPC-SC Perimeter</span>
+        <span class="tag">Shielded VM Boot</span>
+        <span class="tag">Workload Identity Federation</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- L1 -->
+  <div class="layer-card" id="layer-l1">
+    <div class="layer-header">
+      <span class="layer-badge" style="background:#00e5ff;color:#050a0f;">L1</span>
+      <h4>Ambient Mesh / ztunnel</h4>
+      <span class="layer-tag">MESH FABRIC</span>
+    </div>
+    <div class="layer-body">
+      <p><strong>Istio Ambient Mesh</strong> eliminates sidecars entirely by moving L4 policy enforcement to a per-node ztunnel agent. The ztunnel runs as a DaemonSet — one instance per node — and handles all inter-pod communication using <strong>HBONE</strong> (HTTP-Based Overlay Network Encapsulation) tunneling. Every packet between pods traverses this encrypted tunnel, with mTLS enforced at the node level before any traffic reaches a workload.</p>
+      <p>For services requiring L7 capabilities (HTTP routing, JWT validation, header mutation), <strong>Waypoint proxies</strong> are deployed per-namespace or per-service account — full Envoy instances deployed on-demand rather than universally. L4 authorization policies are enforced directly by the ztunnel using SPIFFE SVIDs from L2.</p>
+      <div class="tag-list">
+        <span class="tag">ztunnel DaemonSet</span>
+        <span class="tag">HBONE Tunneling</span>
+        <span class="tag">Waypoint Proxies</span>
+        <span class="tag">L4 mTLS Enforcement</span>
+        <span class="tag">Envoy L7 Gateways</span>
+        <span class="tag">Peer Authorization Policies</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2 -->
+  <div class="layer-card" id="layer-l2">
+    <div class="layer-header">
+      <span class="layer-badge" style="background:#4fc3f7;color:#050a0f;">L2</span>
+      <h4>Zero-Trust Identity Layer</h4>
+      <span class="layer-tag">IDENTITY &amp; CERTIFICATES</span>
+    </div>
+    <div class="layer-body">
+      <p><strong>SPIFFE / SPIRE</strong> (Secure Production Identity Framework For Everyone / SPIFFE Runtime Environment) issues every workload a cryptographically verifiable identity the moment it starts. There are no long-lived passwords, no static API keys, no service account JSON files. Each workload receives an <strong>X.509 SVID</strong> — a short-lived certificate encoding its SPIFFE URI (e.g. <code>spiffe://orcawolf.mesh/ns/ehr/sa/fhir-gateway</code>).</p>
+      <p>Certificate rotation is handled automatically by <strong>cert-manager</strong>, integrated with SPIRE's SVID TTL to renew before expiry — transparently, with zero downtime. Human operators authenticate via <strong>Workload Identity Federation</strong>, binding Google Cloud identities to mesh RBAC roles through OIDC token exchange.</p>
+      <div class="tag-list">
+        <span class="tag">SPIFFE / SPIRE Server</span>
+        <span class="tag">X.509 SVIDs</span>
+        <span class="tag">cert-manager Rotation</span>
+        <span class="tag">Node Attestation</span>
+        <span class="tag">Peer Authentication</span>
+        <span class="tag">Workload Identity Federation</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- L3 -->
+  <div class="layer-card" id="layer-l3">
+    <div class="layer-header">
+      <span class="layer-badge" style="background:#6ee7b7;color:#064e3b;">L3</span>
+      <h4>EHR Interop + Data Sovereignty</h4>
+      <span class="layer-tag">HEALTH DATA LAYER</span>
+    </div>
+    <div class="layer-body">
+      <p>The <strong>FHIR R4 API gateway</strong> is the canonical interface for all Protected Health Information (PHI) exchange. Every FHIR request is validated against the requester's SPIFFE identity before routing begins. The <strong>HL7v2 bridge</strong> translates legacy HL7 v2.x messages (ADT feeds, lab results, pharmacy orders) into FHIR R4 resources in real time.</p>
+      <p>PHI sovereignty is enforced through CMEK at rest (L0), mTLS in transit (L1), and a <strong>data provenance ledger</strong> recording every read/write/transform event — each entry signed by the workload's SVID — creating an immutable audit chain satisfying HIPAA requirements natively. The <strong>de-identification pipeline</strong> uses the Cloud Healthcare API to produce Safe Harbor compliant datasets before any AI workload sees the data.</p>
+      <div class="tag-list">
+        <span class="tag">FHIR R4 Gateway</span>
+        <span class="tag">HL7v2 Bridge</span>
+        <span class="tag">US Core IG Profiles</span>
+        <span class="tag">Data Provenance Ledger</span>
+        <span class="tag">Cloud Healthcare API</span>
+        <span class="tag">PHI De-identification</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- L4 -->
+  <div class="layer-card" id="layer-l4">
+    <div class="layer-header">
+      <span class="layer-badge" style="background:#fbbf24;color:#1a1a00;">L4</span>
+      <h4>AI Inference &amp; Analytics</h4>
+      <span class="layer-tag">INTELLIGENCE LAYER</span>
+    </div>
+    <div class="layer-body">
+      <p><strong>Vertex AI</strong> hosts clinical NLP models trained on de-identified FHIR corpora. The <strong>text-embedding-004</strong> model converts clinical summaries into 768-dimensional semantic vectors — enabling cosine similarity search across historical cases without exposing raw PHI. <strong>Gemini</strong> provides multi-step clinical reasoning, synthesising structured FHIR data with unstructured clinical notes.</p>
+      <p><strong>BigQuery</strong> provides the analytics substrate — petabyte-scale querying of de-identified clinical datasets with column-level access controls enforced by the mesh. All inference requests are authenticated with the calling workload's SVID, and results are logged to the provenance ledger at L3.</p>
+      <div class="tag-list">
+        <span class="tag">Vertex AI</span>
+        <span class="tag">text-embedding-004</span>
+        <span class="tag">Gemini Reasoning</span>
+        <span class="tag">BigQuery Analytics</span>
+        <span class="tag">Clinical NLP</span>
+        <span class="tag">Vector Similarity Search</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- L5 -->
+  <div class="layer-card" id="layer-l5">
+    <div class="layer-header">
+      <span class="layer-badge" style="background:#a78bfa;color:#1a0050;">L5</span>
+      <h4>Observability &amp; Compliance</h4>
+      <span class="layer-tag">TELEMETRY &amp; AUDIT</span>
+    </div>
+    <div class="layer-body">
+      <p><strong>Cloud Logging</strong> captures every mesh event in an immutable, tamper-evident log stream. <strong>Cloud Monitoring</strong> and <strong>Grafana</strong> dashboards provide real-time visibility into mesh health, certificate expiry, policy violations, and AI inference latency. <strong>Cloud Trace</strong> provides distributed request tracing across every hop in the mesh — from the FHIR gateway through de-identification to AI inference and back.</p>
+      <p>Compliance reporting is automated: HIPAA audit reports, NIST 800-53 control evidence, and FedRAMP continuous monitoring data are generated directly from the mesh telemetry stream — no manual evidence collection required.</p>
+      <div class="tag-list">
+        <span class="tag">Cloud Logging (Immutable)</span>
+        <span class="tag">Grafana Dashboards</span>
+        <span class="tag">Cloud Trace</span>
+        <span class="tag">Prometheus Metrics</span>
+        <span class="tag">HIPAA Audit Reports</span>
+        <span class="tag">NIST 800-53 Controls</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- SECTION 4: MCI SIMULATION -->
+<div class="section" id="section-mci">
+  <div class="section-badge">SECTION 04</div>
+  <h2 class="section-title">Mass Casualty Incident (MCI) Simulation</h2>
+  <p class="lead">The MCI Simulation engine provides a fully configurable, AI-driven triage and resource allocation tool for Mass Casualty Incidents — producing real FHIR R4 clinical bundles and a persistent exercise history.</p>
+
+  <h3 class="subsection-title">4.1 How to Run a Simulation</h3>
+  <ol class="step-list">
+    <li>
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <strong>Select a scenario type</strong>
+        <p>Choose from: Blast / Explosion, Chemical / CBRN Exposure, Mass Trauma, Active Shooter, Natural Disaster, or Combined Arms. Each scenario applies different casualty probability weights based on published doctrine.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <strong>Enter your incident parameters</strong>
+        <p>Provide location, total casualty count (1–5,000), available medical personnel, and transport assets.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <strong>Hit "Run Simulation"</strong>
+        <p>The triage engine distributes casualties into RED (Immediate), YELLOW (Delayed), GREEN (Minimal), and BLACK (Expectant) categories, generates a timestamped event log, and produces a FHIR R4 Bundle.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <strong>Download the FHIR Bundle</strong>
+        <p>Click "Download JSON" to save the generated bundle. This file can be loaded directly into <code>fhir_mongo_loader.py</code> or fed into the Vertex AI vector pipeline.</p>
+      </div>
+    </li>
+  </ol>
+
+  <h3 class="subsection-title">4.2 Triage Category Definitions (START / SALT Protocol)</h3>
+  <table class="data-table">
+    <thead><tr><th>Tag</th><th>Category</th><th>Definition</th><th>Treatment Priority</th></tr></thead>
+    <tbody>
+      <tr><td style="color:#ef4444;font-weight:700;">RED</td><td>Immediate</td><td>Life-threatening injuries survivable with immediate intervention</td><td>Highest — treat within 60 minutes</td></tr>
+      <tr><td style="color:#f59e0b;font-weight:700;">YELLOW</td><td>Delayed</td><td>Serious injuries stable enough to wait for treatment</td><td>Second — treat within 4–6 hours</td></tr>
+      <tr><td style="color:#22c55e;font-weight:700;">GREEN</td><td>Minimal</td><td>Minor injuries; walking wounded able to self-care</td><td>Third — treat after RED and YELLOW</td></tr>
+      <tr><td style="color:#6b7280;font-weight:700;">BLACK</td><td>Expectant</td><td>Injuries incompatible with survival given available resources</td><td>Comfort care only</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="subsection-title">4.3 Production Engine Integration</h3>
+  <p>The simulation is backed by three production-grade Python components available in the <code>simulation-engine/</code> directory of the GitHub repository:</p>
+  <ul class="bullet-list">
+    <li><strong>fhir_mongo_loader.py</strong> — Loads generated FHIR Bundle JSON into MongoDB collections, routing each resource type (Patient, Condition, Observation) to its own collection with upsert logic to prevent duplicates.</li>
+    <li><strong>fhir_vector_pipeline.py</strong> — Converts FHIR resources to semantic text summaries and generates 768-dimensional embeddings using Vertex AI <code>text-embedding-004</code>, enabling cosine similarity triage ranking.</li>
+    <li><strong>locustfile.py</strong> — Locust-based load testing script that simulates concurrent CombatMedicUser agents submitting FHIR trauma records to the triage API endpoint.</li>
+  </ul>
+
+  <div class="info-box green">
+    <div class="icon">✓</div>
+    <div class="content">
+      <strong>Every run is saved</strong>
+      <p>All simulation runs are stored with their full FHIR bundle, triage breakdown, and a 768-dimensional semantic embedding vector for longitudinal analysis and scenario comparison.</p>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- SECTION 5: CARRIER READINESS -->
+<div class="section" id="section-carrier">
+  <div class="section-badge">SECTION 05</div>
+  <h2 class="section-title">Carrier Readiness &amp; C2 Dashboard</h2>
+  <p class="lead">The Carrier Readiness simulation provides a Command and Control dashboard for medical and line-of-duty readiness across USS Nimitz (CVN-68) and USS Theodore Roosevelt (CVN-71) under multi-vector threat scenarios.</p>
+
+  <h3 class="subsection-title">5.1 Calibration Settings</h3>
+  <p>Click the <strong>⚙ Calibration Settings</strong> button at the top of the page to open the four-tab mission configuration panel. All settings persist between sessions automatically.</p>
+
+  <table class="data-table">
+    <thead><tr><th>Tab</th><th>What You Configure</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Force Readiness</strong></td><td>Manning levels per role (Pilots, Navigators, Medical Personnel, Firemen, Weapon Operations, Deck Flight Crew) for each vessel; minimum viable thresholds for all readiness metrics.</td></tr>
+      <tr><td><strong>Blood Supply</strong></td><td>Units on hand by blood product type. A red alert fires automatically when O-Negative falls below the 80-unit MASCAL minimum.</td></tr>
+      <tr><td><strong>MedEvac Assets</strong></td><td>Aircraft and transport counts: MH-60S Seahawk, CH-53E Super Stallion, C-130 Hercules, C-17 Globemaster, LCU, and RHIB. Total lift capacity is calculated and displayed in real time.</td></tr>
+      <tr><td><strong>Theater &amp; Echelon</strong></td><td>Select operational theater (Strait of Hormuz, Red Sea, Persian Gulf, Yemen Coast, South China Sea, Eastern Mediterranean, or custom coordinates). Interactive Leaflet map shows carrier position, 200nm CASEVAC radius ring, and Role 2–4 echelon markers.</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="subsection-title">5.2 Running an Exercise</h3>
+  <ol class="step-list">
+    <li>
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <strong>Select vessels</strong>
+        <p>Choose CVN-68, CVN-71, or both for a side-by-side comparison.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <strong>Set crew complement</strong>
+        <p>From Command Element Only (500) up to Full Complement (6,000). Default is 6,000.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <strong>Select threat scenario &amp; intensity</strong>
+        <p>Drone Swarm, Sea-Skimming Missile, EW/GPS Denial, CBRN Exposure, or Combined Arms. Drag the intensity slider 1–100%.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <strong>Hit "Run Exercise"</strong>
+        <p>Medical and LOD readiness dials update with colour-coded status (green / amber / red), the C2 event log streams line by line, and a Recommended Course of Action appears automatically.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <strong>Print C2 Brief</strong>
+        <p>Click "⎙ Print C2 Brief" on any vessel panel to generate a print-ready classified-style brief — UNCLASSIFIED // FOR EXERCISE USE ONLY header, full metrics table, threshold status, and complete event log.</p>
+      </div>
+    </li>
+  </ol>
+
+  <h3 class="subsection-title">5.3 Reading the Dials</h3>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="fc-badge fc-green">GREEN</div>
+      <h4>Above Threshold — Mission Ready</h4>
+      <p>Metric is above the minimum viable threshold. Full operational capability for this domain.</p>
+    </div>
+    <div class="feature-card">
+      <div class="fc-badge fc-amber">AMBER</div>
+      <h4>Caution Zone — Monitor Closely</h4>
+      <p>Metric is approaching the minimum viable threshold. Recommend pre-emptive resupply or redistribution.</p>
+    </div>
+    <div class="feature-card">
+      <div class="fc-badge fc-rose">RED</div>
+      <h4>Below Threshold — Action Required</h4>
+      <p>Metric has fallen below the configured minimum viable threshold. Immediate command action required per the Recommended COA.</p>
+    </div>
+    <div class="feature-card">
+      <div class="fc-badge fc-cyan">DIAL VALUE</div>
+      <h4>Reading the Number</h4>
+      <p>The number displayed in each dial is the current readiness percentage for that metric, calculated from manning, supply levels, and threat degradation.</p>
+    </div>
+  </div>
+
+  <h3 class="subsection-title">5.4 Medical Readiness Dials</h3>
+  <table class="data-table">
+    <thead><tr><th>Dial</th><th>What It Measures</th><th>Default MVT</th></tr></thead>
+    <tbody>
+      <tr><td>Surgical Capacity</td><td>OR availability, surgical team readiness, post-op beds</td><td>70%</td></tr>
+      <tr><td>Blood Supply</td><td>Units on hand vs. projected MASCAL demand by product type</td><td>60%</td></tr>
+      <tr><td>Pharmacy / Formulary</td><td>Critical medication stock levels vs. 72-hour surge requirement</td><td>65%</td></tr>
+      <tr><td>Personnel Fitness</td><td>Medical department personnel fit for duty vs. authorised complement</td><td>75%</td></tr>
+      <tr><td>Mental Health</td><td>Combat stress and PTSD risk index across embarked crew</td><td>60%</td></tr>
+      <tr><td>Preventive Medicine</td><td>Vaccination coverage, heat/cold injury risk, epidemic surveillance</td><td>70%</td></tr>
+      <tr><td>Dental Readiness</td><td>Dental Class 1/2 deployable personnel as % of complement</td><td>80%</td></tr>
+      <tr><td>Medical Readiness</td><td>Composite score across all seven medical domains</td><td>70%</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="subsection-title">5.5 Line-of-Duty Readiness Dials</h3>
+  <table class="data-table">
+    <thead><tr><th>Dial</th><th>What It Measures</th><th>Default MVT</th></tr></thead>
+    <tbody>
+      <tr><td>Watch Station Fill</td><td>Critical watch stations manned vs. required for current EMCON state</td><td>85%</td></tr>
+      <tr><td>DC Certification</td><td>Personnel with current Damage Control qualification</td><td>80%</td></tr>
+      <tr><td>Flight Deck Crew</td><td>Flight deck personnel fit for flight ops vs. air wing requirement</td><td>85%</td></tr>
+      <tr><td>Battle Station Assignment</td><td>GQ assignments filled vs. required for current threat level</td><td>90%</td></tr>
+      <tr><td>Watch Qualifications</td><td>Personnel with current watch quals in their assigned billets</td><td>80%</td></tr>
+      <tr><td>Damage Control Readiness</td><td>DC equipment operability and personnel readiness composite</td><td>75%</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="subsection-title">5.6 Recommended Course of Action</h3>
+  <p>After every exercise run, the system automatically generates a prioritised action list modelled on standard operational reporting:</p>
+  <ul class="bullet-list">
+    <li><strong>P1 Actions</strong> (red — immediate) — life-safety and mission-critical shortfalls requiring action within the current watch</li>
+    <li><strong>P2 Actions</strong> (amber — urgent) — significant degradation requiring action within 24 hours</li>
+    <li><strong>P3 Actions</strong> (green — routine) — monitoring and pre-emptive measures to sustain current readiness</li>
+  </ul>
+  <p>The top-line recommendation tells the Commanding Officer whether to <strong>Maintain Tempo</strong>, <strong>Restrict Operations</strong>, or <strong>Withdraw / Request Relief</strong> based on the aggregate readiness score.</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- SECTION 6: MESH C2 -->
+<div class="section" id="section-meshc2">
+  <div class="section-badge">SECTION 06</div>
+  <h2 class="section-title">Sovereign Mesh C2 — NATS JetStream Dashboard</h2>
+  <p class="lead">The Mesh C2 Dashboard simulates a NATS JetStream edge telemetry feed from both carriers — streaming live MASCAL impacts, TBI exposures, and RTD clearances as JSON events on the mesh topic hierarchy.</p>
+
+  <h3 class="subsection-title">6.1 What You're Seeing</h3>
+  <p>The dashboard auto-starts on load. Every 1.8 seconds, a synthetic event fires on one of the six lines of duty across either vessel:</p>
+  <ul class="bullet-list">
+    <li><strong>MASCAL_IMPACT</strong> (red) — kinetic strike causes casualties; combat effectiveness decreases; capacity bar drops</li>
+    <li><strong>BLAST_EXPOSURE_DETECTED</strong> (amber) — overpressure exposure detected; TBI watch count increments; personnel remain on duty but are flagged for monitoring</li>
+    <li><strong>RTD_CLEARED</strong> (green) — Return to Duty cleared; previously injured personnel restored to effective strength</li>
+  </ul>
+
+  <h3 class="subsection-title">6.2 NATS Topic Hierarchy</h3>
+  <div class="code-block">
+    <span class="comment"># Topic format: mesh.triage.{vessel}.{role}.{event_flag}</span><br>
+    mesh.triage.cvn68.pilots.MASCAL_IMPACT<br>
+    mesh.triage.cvn71.medicalpersonnel.BLAST_EXPOSURE_DETECTED<br>
+    mesh.triage.cvn68.deckflightcrewmen.RTD_CLEARED
+  </div>
+
+  <h3 class="subsection-title">6.3 Live Link to Carrier Readiness</h3>
+  <p>When both the Mesh C2 Dashboard and the Carrier Readiness page are open simultaneously, events from the C2 dashboard drive the Carrier Readiness telemetry feed in real time — the two dashboards form a connected C2 system, mirroring what a real NATS JetStream edge mesh would deliver to a ship's medical operations centre.</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- SECTION 7: LOAD HAMMER -->
+<div class="section" id="section-hammer">
+  <div class="section-badge">SECTION 07</div>
+  <h2 class="section-title">Combat Medic Load Hammer</h2>
+  <p class="lead">The Load Hammer simulates up to 50 concurrent CombatMedicUser agents submitting FHIR trauma records to the triage API — mirroring the behaviour of your Locust load testing script in a live browser environment.</p>
+
+  <h3 class="subsection-title">7.1 How to Use It</h3>
+  <ol class="step-list">
+    <li><div class="step-num">1</div><div class="step-content"><strong>Set GCP Project ID</strong><p>Enter your Google Cloud project ID in the configuration panel at the top. This tags all simulated requests with your project context.</p></div></li>
+    <li><div class="step-num">2</div><div class="step-content"><strong>Drag the agent slider</strong><p>Set the number of concurrent CombatMedicUser agents (1–50). Start with 10 to observe baseline behaviour, then scale up.</p></div></li>
+    <li><div class="step-num">3</div><div class="step-content"><strong>Hit "Launch Hammer"</strong><p>Agents begin firing POST requests every 1–5 seconds with weighted random FHIR R4 trauma payloads across five scenario types.</p></div></li>
+    <li><div class="step-num">4</div><div class="step-content"><strong>Click any request row</strong><p>Expands to show the full Vertex AI pipeline: clinical semantic summary, first 8 embedding dimensions, and cosine triage priority score.</p></div></li>
+  </ol>
+
+  <h3 class="subsection-title">7.2 Reading the Dashboard</h3>
+  <table class="data-table">
+    <thead><tr><th>Metric</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>RPS</td><td>Requests per second — live bar chart with 30-second rolling window and peak indicator</td></tr>
+      <tr><td>Success Rate</td><td>Percentage of requests returning HTTP 200 (simulated) — degrades under extreme load</td></tr>
+      <tr><td>Avg Latency</td><td>Mean response time across all active agents; colour-coded green / amber / red</td></tr>
+      <tr><td>AI Score</td><td>Fleet-wide average Vertex AI cosine triage priority score (0.0–1.0)</td></tr>
+      <tr><td>Scenario Mix</td><td>Bar chart showing distribution of blast, chemical, mass trauma, active shooter, and natural disaster payloads</td></tr>
+      <tr><td>Agent Grid</td><td>Every active agent shown as a numbered pulsing tile; dims when idle</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="divider"></div>
+
+<!-- SECTION 8: INNOVATION -->
+<div class="section" id="section-innovation">
+  <div class="section-badge">SECTION 08</div>
+  <h2 class="section-title">Innovation Lab</h2>
+  <p class="lead">The Innovation Lab documents six active research and development tracks within the OrcaWolf AI platform — from federated mesh learning to outcome-driven resource optimisation.</p>
+
+  <table class="data-table">
+    <thead><tr><th>Innovation Track</th><th>Status</th><th>Key Technologies</th></tr></thead>
+    <tbody>
+      <tr><td><strong>AI-Native EHR Processing</strong></td><td style="color:#16a34a;">Active Research</td><td>Vertex AI, FHIR R4, Clinical NLP, RAG pipeline</td></tr>
+      <tr><td><strong>Federated Mesh Learning</strong></td><td style="color:#d97706;">Prototype</td><td>Federated Learning, Differential Privacy, Waypoint Policy</td></tr>
+      <tr><td><strong>Ambient Mesh GitOps</strong></td><td style="color:#16a34a;">Active Research</td><td>Argo CD, Policy as Code, SPIFFE signing, Audit lineage</td></tr>
+      <tr><td><strong>Sovereign Data Mesh</strong></td><td style="color:#0891b2;">Production</td><td>Data Mesh, Data Contracts, Data Provenance, Domain ownership</td></tr>
+      <tr><td><strong>Real-Time MCI Intelligence</strong></td><td style="color:#16a34a;">Active Research</td><td>Pub/Sub streaming, Edge inference, Vertex Forecast</td></tr>
+      <tr><td><strong>Outcome-Driven Resource Optimizer</strong></td><td style="color:#d97706;">Prototype</td><td>Reinforcement Learning, Gemini reasoning, Live telemetry</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="divider"></div>
+
+<!-- SECTION 9-11: ADMIN & GITHUB -->
+<div class="section" id="section-contact">
+  <div class="section-badge">SECTION 09</div>
+  <h2 class="section-title">Contact &amp; Enquiry Management</h2>
+  <p>The Contact page (<strong>/contact</strong>) provides a full-featured enquiry form covering: General Enquiry, Architecture Consultation, MCI Simulation, Partnership, Press &amp; Media, and Quote Request. Quote requests surface additional fields for budget range and project timeline. Every submission is saved and accessible through the Admin Dashboard.</p>
+</div>
+
+<div class="section" id="section-admin">
+  <div class="section-badge">SECTION 10</div>
+  <h2 class="section-title">Admin Dashboard</h2>
+  <p>Access the private admin view at <strong>/admin/login</strong>. The dashboard displays all submitted enquiries with live stats (total, last 24 hours, quote requests), a search bar, subject filters, and expandable message cards. Each enquiry includes a one-click "Reply via email client" button pre-addressed to the sender.</p>
+  <div class="info-box red">
+    <div class="icon">🔒</div>
+    <div class="content">
+      <strong>Keep your admin credentials confidential</strong>
+      <p>Your admin login credentials should be stored securely and not shared. Contact OrcaWolf AI directly if you need a credential reset.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="section-github">
+  <div class="section-badge">SECTION 11</div>
+  <h2 class="section-title">GitHub Integration &amp; Source Code Access</h2>
+  <p>The complete source code for this platform lives at <strong>github.com/jwolf2064/orcawolfai-site</strong>. To set up a local development environment:</p>
+  <div class="code-block">
+git clone https://github.com/jwolf2064/orcawolfai-site.git "C:\Users\jwolf\Local OrcaWolf AI Projects\orcawolfai-site"<br>
+cd "C:\Users\jwolf\Local OrcaWolf AI Projects\orcawolfai-site"
+  </div>
+  <p>The simulation engine source files live in <code>simulation-engine/</code> — these are the production Python components from the <code>orcawolf-edge-triage-sim</code> repository, merged into the main codebase.</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- SECTION 12: DATA SOURCES -->
+<div class="section" id="section-data">
+  <div class="section-badge">SECTION 12</div>
+  <h2 class="section-title">Data Sources &amp; Methodology</h2>
+  <p class="lead">All simulation data is synthetically generated using probability weights derived from published, unclassified military medical doctrine. When asked about the source of simulation data, the following statement is accurate and defensible:</p>
+
+  <div class="info-box blue">
+    <div class="icon">📋</div>
+    <div class="content">
+      <strong>Official Statement for Evaluators</strong>
+      <p><em>"The simulation uses synthetic casualty generation weighted against published NATO STANAG 2122 tables and US Joint Trauma System Clinical Practice Guidelines — it is an unclassified training demonstrator showing what a real-time sovereign mesh telemetry architecture could support, not a feed from any classified or operational system."</em></p>
+    </div>
+  </div>
+
+  <table class="data-table">
+    <thead><tr><th>Standard / Source</th><th>Used For</th></tr></thead>
+    <tbody>
+      <tr><td><strong>NATO STANAG 2122</strong></td><td>Allied standard for combat casualty estimation rates by threat type (blast, fragmentation, burn, CBRN)</td></tr>
+      <tr><td><strong>JTS Clinical Practice Guidelines</strong></td><td>US DoD published doctrine for expected casualty distributions in mass casualty events at sea</td></tr>
+      <tr><td><strong>TCCC Field Statistics</strong></td><td>Published survival and RTD (Return to Duty) rates by injury category</td></tr>
+      <tr><td><strong>NMRC Blast / TBI Thresholds</strong></td><td>Naval Medical Research Center overpressure and TBI exposure thresholds for drone/missile proximity</td></tr>
+      <tr><td><strong>START / SALT Triage Protocol</strong></td><td>RED / YELLOW / GREEN / BLACK category definitions and treatment priority rules</td></tr>
+      <tr><td><strong>FHIR R4 (HL7 International)</strong></td><td>Clinical resource structure for Patient, Condition, Observation, and Bundle resources</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="divider"></div>
+
+<!-- SECTION 13: GLOSSARY -->
+<div class="section" id="section-glossary">
+  <div class="section-badge">SECTION 13</div>
+  <h2 class="section-title">Glossary of Terms</h2>
+
+  <div class="glossary-item"><div class="glossary-term">Ambient Mesh</div><div class="glossary-def">Istio architecture mode that eliminates per-pod sidecar proxies, moving L4 enforcement to per-node ztunnel agents.</div></div>
+  <div class="glossary-item"><div class="glossary-term">CASEVAC</div><div class="glossary-def">Casualty Evacuation — movement of casualties from point of injury to a higher echelon of medical care.</div></div>
+  <div class="glossary-item"><div class="glossary-term">CBRN</div><div class="glossary-def">Chemical, Biological, Radiological, and Nuclear — threat classification for non-conventional weapons.</div></div>
+  <div class="glossary-item"><div class="glossary-term">CMEK</div><div class="glossary-def">Customer-Managed Encryption Key — encryption key held and controlled by the customer, not the cloud provider.</div></div>
+  <div class="glossary-item"><div class="glossary-term">COA</div><div class="glossary-def">Course of Action — a recommended set of actions for a commander to address a tactical situation.</div></div>
+  <div class="glossary-item"><div class="glossary-term">EMCON</div><div class="glossary-def">Emissions Control — operational state controlling radio and radar emissions to reduce detection signature.</div></div>
+  <div class="glossary-item"><div class="glossary-term">FHIR R4</div><div class="glossary-def">Fast Healthcare Interoperability Resources Release 4 — the modern HL7 standard for clinical data exchange via REST APIs.</div></div>
+  <div class="glossary-item"><div class="glossary-term">GKE</div><div class="glossary-def">Google Kubernetes Engine — Google's managed Kubernetes service.</div></div>
+  <div class="glossary-item"><div class="glossary-term">HBONE</div><div class="glossary-def">HTTP-Based Overlay Network Encapsulation — the tunneling protocol used by Istio Ambient Mesh ztunnel for encrypted inter-node traffic.</div></div>
+  <div class="glossary-item"><div class="glossary-term">HL7 v2</div><div class="glossary-def">Health Level Seven Version 2 — the legacy message-based healthcare data standard used by most existing hospital systems.</div></div>
+  <div class="glossary-item"><div class="glossary-term">JOMIS</div><div class="glossary-def">Joint Operational Medical Information System — DoD programme for theatre medical command and control.</div></div>
+  <div class="glossary-item"><div class="glossary-term">MASCAL</div><div class="glossary-def">Mass Casualty — a military medical term for an incident producing more casualties than available resources can immediately treat.</div></div>
+  <div class="glossary-item"><div class="glossary-term">MEDEVAC</div><div class="glossary-def">Medical Evacuation — movement of casualties using dedicated medical transport assets with en-route care.</div></div>
+  <div class="glossary-item"><div class="glossary-term">mTLS</div><div class="glossary-def">Mutual Transport Layer Security — TLS where both client and server authenticate with certificates before communication.</div></div>
+  <div class="glossary-item"><div class="glossary-term">MVT</div><div class="glossary-def">Minimum Viable Threshold — the floor readiness percentage below which a metric triggers a command action.</div></div>
+  <div class="glossary-item"><div class="glossary-term">NATS JetStream</div><div class="glossary-def">NATS is a high-performance messaging system; JetStream is its persistent streaming layer used for edge telemetry.</div></div>
+  <div class="glossary-item"><div class="glossary-term">PHI</div><div class="glossary-def">Protected Health Information — individually identifiable health data protected under HIPAA.</div></div>
+  <div class="glossary-item"><div class="glossary-term">RTD</div><div class="glossary-def">Return to Duty — medical clearance returning a casualty to full operational status.</div></div>
+  <div class="glossary-item"><div class="glossary-term">SPIFFE</div><div class="glossary-def">Secure Production Identity Framework For Everyone — open standard for workload identity in zero-trust environments.</div></div>
+  <div class="glossary-item"><div class="glossary-term">SPIRE</div><div class="glossary-def">SPIFFE Runtime Environment — the production implementation of the SPIFFE standard.</div></div>
+  <div class="glossary-item"><div class="glossary-term">SVID</div><div class="glossary-def">SPIFFE Verifiable Identity Document — a short-lived X.509 certificate encoding a workload's SPIFFE URI.</div></div>
+  <div class="glossary-item"><div class="glossary-term">TCCC</div><div class="glossary-def">Tactical Combat Casualty Care — US military field medicine protocol for combat casualty management.</div></div>
+  <div class="glossary-item"><div class="glossary-term">TBI</div><div class="glossary-def">Traumatic Brain Injury — blast overpressure injury requiring monitoring and removal from high-risk duty.</div></div>
+  <div class="glossary-item"><div class="glossary-term">VPC-SC</div><div class="glossary-def">VPC Service Controls — Google Cloud security perimeter preventing data exfiltration from a defined resource boundary.</div></div>
+  <div class="glossary-item"><div class="glossary-term">Vertex AI</div><div class="glossary-def">Google Cloud's managed machine learning platform for training, deploying, and serving AI models.</div></div>
+  <div class="glossary-item"><div class="glossary-term">ztunnel</div><div class="glossary-def">Zero-Trust Tunnel — the per-node agent in Istio Ambient Mesh responsible for L4 mTLS enforcement.</div></div>
+
+  <div class="page-num">
+    ORCAWOLF AI — SOVEREIGN MESH &amp; OFF-GRID AI EHR INFRASTRUCTURE<br>
+    COMPREHENSIVE USER GUIDE v1.0 — OCTOBER 2026<br>
+    UNCLASSIFIED // FOR DEMONSTRATION AND EXERCISE USE ONLY
+  </div>
+</div>
+
+</div><!-- end body-content -->
+</div><!-- end page -->
+</body>
+</html>
