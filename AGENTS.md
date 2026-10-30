@@ -111,7 +111,7 @@ Multi-page React app with client-side routing (BrowserRouter in main.jsx).
 - `/` — Home: hero with mesh diagram, six-pillar architecture overview, CTA
 - `/architecture` — Six-layer sovereign mesh stack (L0–L5), design principles
 - `/simulation` — Mass Casualty Incident simulation engine (runs client-side, no data stored)
-- `/innovation` — Research & ideas: six innovation cards with status indicators
+- `/innovation` — Six research tracks as interactive workflow diagrams; each step opens a panel with analytics computed in-browser from saved runs (`src/lib/innovationData.js`, content in `src/lib/innovationGroups.jsx`)
 - `/about` — Mission, principles, link to orcawolfai.com
 
 ### Components

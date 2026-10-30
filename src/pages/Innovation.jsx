@@ -1,145 +1,250 @@
+import { useEffect, useState, useCallback } from "react";
+import { Link } from "react-router";
 import ZapIcon from "icon:zap";
 import CpuIcon from "icon:cpu";
 import GitBranchIcon from "icon:git-branch";
 import DatabaseIcon from "icon:database";
 import GlobeIcon from "icon:globe";
 import TrendingUpIcon from "icon:trending-up";
+import RefreshIcon from "icon:refresh-cw";
+import XIcon from "icon:x";
+import { GROUPS } from "../lib/innovationGroups";
+import { loadInnovationData, buildAnalytics } from "../lib/innovationData";
 
-const INNOVATIONS = [
-  {
-    icon: CpuIcon,
-    title: "AI-Native EHR Processing",
-    status: "Active Research",
-    statusColor: "text-emerald-400",
-    body: "Large language models trained on de-identified clinical corpora reason over structured FHIR data, surfacing triage insights, diagnostic differentials, and protocol recommendations — all within the sovereign mesh boundary.",
-    tags: ["Vertex AI", "FHIR R4", "Clinical NLP", "RAG pipeline"],
-  },
-  {
-    icon: GlobeIcon,
-    title: "Federated Mesh Learning",
-    status: "Prototype",
-    statusColor: "text-amber-400",
-    body: "Model weights improve across hospital systems without raw data ever leaving each facility. Differential privacy and secure aggregation run as mesh-native waypoint policies — verifiable without trust in a central coordinator.",
-    tags: ["Federated Learning", "Differential Privacy", "Waypoint Policy", "Secure Aggregation"],
-  },
-  {
-    icon: GitBranchIcon,
-    title: "Ambient Mesh GitOps",
-    status: "Active Research",
-    statusColor: "text-emerald-400",
-    body: "Istio AuthorizationPolicy and PeerAuthentication manifests managed as code — every mesh policy change goes through a signed, audited GitOps pipeline, giving operations teams full lineage of who changed what and when.",
-    tags: ["Argo CD", "Policy as Code", "SPIFFE signing", "Audit lineage"],
-  },
-  {
-    icon: DatabaseIcon,
-    title: "Sovereign Data Mesh",
-    status: "Production",
-    statusColor: "text-cyan-400",
-    body: "Each domain (ED, ICU, pharmacy, radiology) owns its data product. Mesh-enforced data contracts between domains replace hand-crafted ETL pipelines — with cryptographic provenance on every record.",
-    tags: ["Data Mesh", "Data Contracts", "Data Provenance", "Domain ownership"],
-  },
-  {
-    icon: ZapIcon,
-    title: "Real-Time MCI Intelligence",
-    status: "Active Research",
-    statusColor: "text-emerald-400",
-    body: "Streaming vitals, triage tags, and resource signals fed through Pub/Sub into AI models give incident commanders a continuously updated picture — time-to-treatment predictions accurate to within minutes.",
-    tags: ["Pub/Sub streaming", "Edge inference", "Vertex Forecast", "Resource modeling"],
-  },
-  {
-    icon: TrendingUpIcon,
-    title: "Outcome-Driven Resource Optimizer",
-    status: "Prototype",
-    statusColor: "text-amber-400",
-    body: "Reinforcement learning agent trained on historical MCI outcome data suggests real-time re-allocation of personnel, OR capacity, and blood supply — balancing survival probability across the entire incident population.",
-    tags: ["Reinforcement Learning", "Multi-objective optimization", "Gemini reasoning", "Live telemetry"],
-  },
-];
+const ICONS = { ehr: CpuIcon, fed: GlobeIcon, gitops: GitBranchIcon, datamesh: DatabaseIcon, mci: ZapIcon, optimizer: TrendingUpIcon };
+
+function Detail({ group, node, data, ctx, onClose, idx }) {
+  const out = node.build(data, ctx);
+  const computed = node.kind === "data";
+  return (
+    <section
+      aria-labelledby={`${group.id}-detail-title`}
+      className="mt-5 rounded-xl border bg-[#050a0f] p-5 sm:p-6 animate-fade-in"
+      style={{ borderColor: `${group.accent}66` }}
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+        <div>
+          <p className="text-xs font-mono mb-1" style={{ color: group.accent }}>Step {idx + 1} of {group.nodes.length} · {node.stage}</p>
+          <h3 id={`${group.id}-detail-title`} className="text-xl font-bold text-white">{node.key}</h3>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className={`text-xs font-mono px-2.5 py-1 rounded-full border ${computed ? "border-emerald-400/40 text-emerald-300 bg-emerald-400/10" : "border-amber-400/40 text-amber-300 bg-amber-400/10"}`}>
+            {computed ? "Computed from your runs" : "Illustrative reference"}
+          </span>
+          <button type="button" onClick={onClose} className="min-h-[36px] min-w-[36px] inline-flex items-center justify-center rounded-md border border-slate-600 text-slate-300 hover:text-white hover:border-slate-400" >
+            <XIcon className="w-4 h-4" aria-hidden="true" />
+            <span className="sr-only">Close details</span>
+          </button>
+        </div>
+      </div>
+
+      <dl className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+        {out.stats.map(([k, v]) => (
+          <div key={k} className="rounded-lg bg-[#0a1628] border border-slate-700/60 px-4 py-3 min-w-0">
+            <dt className="text-xs text-slate-300">{k}</dt>
+            <dd className="font-mono text-base text-white mt-1 break-words">{String(v)}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">
+        <div className="space-y-4 text-sm leading-relaxed">
+          <div>
+            <h4 className="text-xs font-mono uppercase tracking-wider mb-1" style={{ color: group.accent }}>What it does</h4>
+            <p className="text-slate-200">{out.what}</p>
+          </div>
+          <div>
+            <h4 className="text-xs font-mono uppercase tracking-wider mb-1" style={{ color: group.accent }}>Where the data comes from</h4>
+            <p className="text-slate-200">{out.source}</p>
+          </div>
+          <div>
+            <h4 className="text-xs font-mono uppercase tracking-wider mb-1" style={{ color: group.accent }}>What it produces</h4>
+            <p className="text-slate-200">{out.output}</p>
+          </div>
+          {out.link && (
+            <Link to={out.link.to} className="inline-flex items-center min-h-[40px] text-cyan-300 underline underline-offset-4 hover:text-cyan-100">{out.link.label} →</Link>
+          )}
+        </div>
+        <div className="min-w-0 space-y-4">
+          {out.controls}
+          {out.visual}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function GroupCard({ group, data, ctx, index }) {
+  const [sel, setSel] = useState(null);
+  const Icon = ICONS[group.id];
+  const node = sel !== null ? group.nodes[sel] : null;
+
+  return (
+    <article
+      className="flow-card rounded-2xl border border-slate-700/60 bg-[#070e18] p-5 sm:p-7 transition-colors duration-200 hover:bg-[#0a1628] animate-fade-in-up"
+      style={{ animationDelay: `${index * 0.08}s`, borderColor: sel !== null ? `${group.accent}88` : undefined }}
+    >
+      <div className="flex flex-wrap items-start gap-4 mb-6">
+        <div className="w-11 h-11 rounded-lg flex items-center justify-center shrink-0 border" style={{ background: `${group.accent}1a`, borderColor: `${group.accent}44` }}>
+          <Icon className="w-5 h-5" style={{ color: group.accent }} aria-hidden="true" />
+        </div>
+        <div className="flex-1 min-w-[16rem]">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-white font-semibold text-xl">{group.title}</h2>
+            <span className={`text-xs font-mono font-medium ${group.statusColor} flex items-center gap-1.5`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${group.statusColor.replace("text-", "bg-")} animate-pulse`} aria-hidden="true" />
+              {group.status}
+            </span>
+          </div>
+          <p className="text-slate-300 text-sm leading-relaxed mt-2 max-w-3xl">{group.body}</p>
+        </div>
+      </div>
+
+      {/* Workflow diagram */}
+      <ol className="flex flex-col lg:flex-row lg:items-stretch gap-2 lg:gap-0 list-none p-0 m-0" style={{ color: group.accent }} aria-label={`${group.title} workflow`}>
+        <li className="lg:w-36 shrink-0 flex">
+          <div className="w-full rounded-lg border border-dashed border-slate-600 px-3 py-3 text-xs text-slate-300 flex flex-col justify-center">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-slate-400">Input</span>
+            {group.input}
+          </div>
+        </li>
+        {group.nodes.map((n, i) => (
+          <li key={n.key} className="contents">
+            <span className="flow-link hidden lg:block self-center w-6 shrink-0" aria-hidden="true" />
+            <span className="lg:hidden text-center leading-none text-lg" aria-hidden="true">↓</span>
+            <div className="flex-1 flex min-w-0">
+              <button
+                type="button"
+                aria-pressed={sel === i}
+                aria-controls={`${group.id}-detail`}
+                onClick={() => setSel(sel === i ? null : i)}
+                className="w-full text-left rounded-lg border px-4 py-3 min-h-[76px] transition-all duration-150 cursor-pointer hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2"
+                style={{
+                  borderColor: sel === i ? group.accent : "#334155",
+                  background: sel === i ? `${group.accent}26` : "#0a1628",
+                  outlineColor: group.accent,
+                  boxShadow: sel === i ? `0 0 22px ${group.accent}33` : undefined,
+                }}
+              >
+                <span className="block font-mono text-[10px] uppercase tracking-wider text-slate-400">Step {i + 1}</span>
+                <span className="block text-sm font-semibold text-white leading-snug">{n.key}</span>
+                <span className="block text-xs text-slate-300 mt-0.5">{n.stage}</span>
+              </button>
+            </div>
+          </li>
+        ))}
+        <li className="contents">
+          <span className="flow-link hidden lg:block self-center w-6 shrink-0" aria-hidden="true" />
+          <span className="lg:hidden text-center leading-none text-lg" aria-hidden="true">↓</span>
+          <div className="lg:w-36 shrink-0 flex">
+            <div className="w-full rounded-lg border px-3 py-3 text-xs text-white flex flex-col justify-center" style={{ borderColor: `${group.accent}77`, background: `${group.accent}14` }}>
+              <span className="font-mono text-[10px] uppercase tracking-wider text-slate-300">Output</span>
+              {group.output}
+            </div>
+          </div>
+        </li>
+      </ol>
+
+      <div id={`${group.id}-detail`}>
+        {node ? (
+          <Detail key={node.key} group={group} node={node} idx={sel} data={data} ctx={ctx} onClose={() => setSel(null)} />
+        ) : (
+          <p className="mt-4 text-xs text-slate-300 font-mono">Select a step above to see the data behind it.</p>
+        )}
+      </div>
+    </article>
+  );
+}
 
 export default function Innovation() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [eps, setEps] = useState(1);
+  const [res, setRes] = useState(25);
+  const [scen, setScen] = useState("blast");
+
+  const load = useCallback(() => {
+    const controller = new AbortController();
+    setLoading(true);
+    loadInnovationData(controller.signal)
+      .then(setData)
+      .catch((e) => { if (!e?.isAbort) setData(buildAnalytics([], [])); })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => load(), [load]);
+
+  const ctx = { eps, setEps, res, setRes, scen, setScen };
+
   return (
     <div className="min-h-screen pt-24 pb-20 px-4 mesh-bg">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-violet-400/30 bg-violet-400/5 text-violet-400 text-xs font-mono mb-6">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-violet-400/30 bg-violet-400/5 text-violet-300 text-xs font-mono mb-6">
             <ZapIcon className="w-3 h-3" aria-hidden="true" />
             Innovation Lab
           </div>
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-6">
-            Research &amp; <span className="text-cyan-400">Ideas</span>
+            Research &amp; <span className="text-cyan-400">Ideas</span>, in action
           </h1>
-          <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-            What we're building toward — the ideas and prototypes shaping the next
-            generation of sovereign AI-native healthcare infrastructure.
+          <p className="text-slate-300 text-lg max-w-3xl mx-auto">
+            Six research tracks, each shown as a working flow. Select any step to see the data behind it — what it is calculated from and what it predicts — using the simulations you have run on this site.
           </p>
         </div>
 
-        {/* Status legend */}
-        <div className="flex flex-wrap gap-4 justify-center mb-10" aria-label="Status legend">
+        {/* Data provenance strip */}
+        <div className="rounded-xl border border-cyan-400/25 bg-[#0a1628] p-4 sm:p-5 mb-8 flex flex-wrap items-center justify-between gap-4" role="status" aria-live="polite">
+          <div className="text-sm text-slate-200 max-w-3xl">
+            {loading || !data ? (
+              "Loading your simulation data…"
+            ) : data.usingBaseline ? (
+              <>No saved simulation runs yet, so reference scenarios are shown. <Link to="/simulation" className="text-cyan-300 underline underline-offset-4">Run a simulation</Link> and every flow below updates with your own results.</>
+            ) : (
+              <>Calculated live from <strong className="text-white">{data.sims.length} simulation run{data.sims.length === 1 ? "" : "s"}</strong> and <strong className="text-white">{data.carriers.length} carrier exercise{data.carriers.length === 1 ? "" : "s"}</strong> saved on this site. All figures are synthetic training data — no operational feeds, no live cloud calls.</>
+            )}
+          </div>
+          <button type="button" onClick={load} className="min-h-[40px] inline-flex items-center gap-2 px-4 rounded-md border border-cyan-400/40 text-cyan-300 text-sm hover:bg-cyan-400/10">
+            <RefreshIcon className="w-4 h-4" aria-hidden="true" />
+            Refresh data
+          </button>
+        </div>
+
+        {/* Legend */}
+        <ul className="flex flex-wrap gap-x-6 gap-y-2 justify-center mb-10 text-sm list-none p-0" aria-label="Legend">
           {[
-            { label: "Production", color: "text-cyan-400", dot: "bg-cyan-400" },
-            { label: "Active Research", color: "text-emerald-400", dot: "bg-emerald-400" },
-            { label: "Prototype", color: "text-amber-400", dot: "bg-amber-400" },
-          ].map(({ label, color, dot }) => (
-            <div key={label} className="flex items-center gap-2 text-sm">
+            ["Production", "text-cyan-400", "bg-cyan-400"],
+            ["Active Research", "text-emerald-400", "bg-emerald-400"],
+            ["Prototype", "text-amber-400", "bg-amber-400"],
+          ].map(([l, c, dot]) => (
+            <li key={l} className="flex items-center gap-2">
               <span className={`w-2 h-2 rounded-full ${dot}`} aria-hidden="true" />
-              <span className={color}>{label}</span>
-            </div>
+              <span className={c}>{l}</span>
+            </li>
           ))}
-        </div>
+        </ul>
 
-        {/* Innovation cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {INNOVATIONS.map(({ icon: Icon, title, status, statusColor, body, tags }, i) => (
-            <article
-              key={title}
-              className="rounded-xl border border-slate-700/60 bg-[#070e18] p-6 hover:border-cyan-400/30 hover:bg-[#0a1628] transition-all duration-200 animate-fade-in-up flex flex-col gap-4"
-              style={{ animationDelay: `${i * 0.1}s` }}
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="w-10 h-10 rounded-lg bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center shrink-0">
-                  <Icon className="w-5 h-5 text-cyan-400" aria-hidden="true" />
-                </div>
-                <span className={`text-xs font-mono font-medium ${statusColor} flex items-center gap-1.5`}>
-                  <span className={`w-1.5 h-1.5 rounded-full ${statusColor.replace("text-", "bg-")} animate-pulse`} aria-hidden="true" />
-                  {status}
-                </span>
-              </div>
-              <h2 className="text-white font-semibold text-lg leading-snug">{title}</h2>
-              <p className="text-slate-400 text-sm leading-relaxed flex-1">{body}</p>
-              <ul className="flex flex-wrap gap-2" role="list">
-                {tags.map((tag) => (
-                  <li
-                    key={tag}
-                    className="px-2.5 py-1 rounded-full text-xs font-mono text-slate-400 bg-slate-800 border border-slate-700"
-                  >
-                    {tag}
-                  </li>
-                ))}
-              </ul>
-            </article>
-          ))}
-        </div>
+        {data ? (
+          <div className="flex flex-col gap-6">
+            {GROUPS.map((g, i) => <GroupCard key={g.id} group={g} data={data} ctx={ctx} index={i} />)}
+          </div>
+        ) : (
+          <p className="text-center text-slate-300 py-20">Loading…</p>
+        )}
 
-        {/* GitHub callout */}
         <div className="mt-16 rounded-2xl border border-cyan-400/20 bg-gradient-to-br from-[#0a1628] to-[#070e18] p-10 text-center">
           <h2 className="font-display text-3xl font-bold text-white mb-4">
             Follow the work on <span className="text-cyan-400">GitHub</span>
           </h2>
-          <p className="text-slate-400 mb-8 max-w-lg mx-auto">
-            The OrcaWolf codebase — simulation engine, mesh configuration, and AI pipeline — 
-            lives in GitHub. Connect your subscription to pull from and contribute to the repo.
+          <p className="text-slate-300 mb-8 max-w-lg mx-auto">
+            The OrcaWolf codebase — simulation engine, mesh configuration, and AI pipeline — lives on GitHub.
           </p>
           <a
-            href="https://github.com"
+            href="https://github.com/jwolf2064/orcawolfai-site"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded border border-cyan-400/30 text-cyan-400 font-semibold text-sm hover:bg-cyan-400/10 transition-all"
+            className="inline-flex items-center gap-2 px-8 py-4 min-h-[44px] rounded border border-cyan-400/30 text-cyan-300 font-semibold text-sm hover:bg-cyan-400/10 transition-all"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
-            </svg>
             View on GitHub
           </a>
         </div>
