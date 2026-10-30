@@ -1,6 +1,6 @@
 # Project Setup
 
-Last updated: 2026-10-03
+Last updated: 2026-10-30
 
 Factual state of this project, for the assistant's reference. Record project
 state here only — structure, installed packages, active patterns. Keep it brief.
@@ -112,6 +112,7 @@ Multi-page React app with client-side routing (BrowserRouter in main.jsx).
 - `/architecture` — Six-layer sovereign mesh stack (L0–L5), design principles
 - `/simulation` — Mass Casualty Incident simulation engine (runs client-side, no data stored)
 - `/innovation` — Six research tracks as interactive workflow diagrams; each step opens a panel with analytics computed in-browser from saved runs (`src/lib/innovationData.js`, content in `src/lib/innovationGroups.jsx`)
+- User Guide (`static/OrcaWolfAI-UserGuide.html`, mirrored in `public/`) includes §8.1–8.3: Innovation workflow explainer, 5-minute demo script, Q&A
 - `/about` — Mission, principles, link to orcawolfai.com
 
 ### Components

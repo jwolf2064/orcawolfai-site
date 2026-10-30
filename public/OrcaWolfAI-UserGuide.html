@@ -556,6 +556,7 @@
   <div class="toc-section">
     <h3>Platform &amp; Administration</h3>
     <a class="toc-item" href="#section-innovation"><span><span class="toc-num">8</span> Innovation Lab</span><span class="toc-page">19</span></a>
+    <a class="toc-item toc-sub" href="#innovation-demo-script"><span>8.2 How to Demo This Page</span><span class="toc-page">19</span></a>
     <a class="toc-item" href="#section-contact"><span><span class="toc-num">9</span> Contact &amp; Enquiry Management</span><span class="toc-page">20</span></a>
     <a class="toc-item" href="#section-admin"><span><span class="toc-num">10</span> Admin Dashboard</span><span class="toc-page">20</span></a>
     <a class="toc-item" href="#section-github"><span><span class="toc-num">11</span> GitHub Integration &amp; Source Code Access</span><span class="toc-page">21</span></a>
@@ -1066,6 +1067,31 @@
       <tr><td><strong>Sovereign Data Mesh</strong></td><td style="color:#0891b2;">Production</td><td>Data Mesh, Data Contracts, Data Provenance, Domain ownership</td></tr>
       <tr><td><strong>Real-Time MCI Intelligence</strong></td><td style="color:#16a34a;">Active Research</td><td>Pub/Sub streaming, Edge inference, Vertex Forecast</td></tr>
       <tr><td><strong>Outcome-Driven Resource Optimizer</strong></td><td style="color:#d97706;">Prototype</td><td>Reinforcement Learning, Gemini reasoning, Live telemetry</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="subsection-title" id="innovation-how-it-works">8.1 How the Workflow Diagrams Work</h3>
+  <p>Each of the six tracks is drawn as a left-to-right workflow: an input, four clickable steps, then an output. Hover over a track and the connecting lines animate. Click any step to open a panel showing <strong>what it does</strong>, <strong>where its data comes from</strong>, <strong>what it produces</strong>, and live figures with a table or chart built from the runs saved on the site.</p>
+  <div class="info-box amber"><div><strong>Reading the badges.</strong> <em>Computed from your runs</em> means the figures come from simulations saved on the MCI Simulation and Carrier Readiness pages. <em>Illustrative reference</em> means a reference design (for example the Argo CD and policy examples) that is not connected to a live cluster.</div></div>
+
+  <h3 class="subsection-title" id="innovation-demo-script">8.2 How to Demo This Page (5-Minute Script)</h3>
+  <ol class="step-list">
+    <li><span class="step-num">1</span><div class="step-content"><strong>Prepare (before the meeting).</strong> Run three or four simulations on the MCI Simulation page (try Blast, Chemical and Active Shooter) and two or three exercises on the Carrier Readiness page. The Innovation panels then show your own saved results. With no saved runs, the page falls back to clearly labelled reference scenarios.</div></li>
+    <li><span class="step-num">2</span><div class="step-content"><strong>Open with the banner (30 sec).</strong> Point to the top of the page: all figures are synthetic training data with no operational feeds. Say this first — it sets the right expectation.</div></li>
+    <li><span class="step-num">3</span><div class="step-content"><strong>Start with Real-Time MCI Intelligence (2 min).</strong> Click <em>Pub/Sub Streaming</em>, then <em>Edge Inference</em>, then <em>Vertex Forecast</em>. Explain that the forecast compares how long each saved incident took to stabilise against the RED patients each responder had to treat, then projects 50, 100, 250, 500 and 1,000 casualties. Change the scenario and the responders-on-scene control live to show the shortfall move.</div></li>
+    <li><span class="step-num">4</span><div class="step-content"><strong>Show Resource Modeling (30 sec).</strong> It turns the forecast into a responder count — “how many people do we need”.</div></li>
+    <li><span class="step-num">5</span><div class="step-content"><strong>Pick one governance track (1 min).</strong> Open <em>Ambient Mesh GitOps</em> or <em>Sovereign Data Mesh</em> to show policy-as-code and data ownership, and call out the “Illustrative reference” badge honestly.</div></li>
+    <li><span class="step-num">6</span><div class="step-content"><strong>Close with the Outcome-Driven Resource Optimizer (1 min).</strong> Show the Gemini reasoning step and note it is a template-written brief, not a live model call.</div></li>
+  </ol>
+
+  <h3 class="subsection-title" id="innovation-qa">8.3 Likely Questions &amp; Credible Answers</h3>
+  <table class="data-table">
+    <thead><tr><th>Question</th><th>Answer</th></tr></thead>
+    <tbody>
+      <tr><td>Where does the data come from?</td><td>Synthetic runs generated in the browser and saved on the site, weighted against published standards (NATO STANAG 2122, Joint Trauma System guidelines, TCCC). No classified or operational feeds.</td></tr>
+      <tr><td>Is the Vertex Forecast a live Google Cloud call?</td><td>No. It illustrates a Vertex forecasting model, calculated in the browser from saved runs. Deploying the Python pipeline to Cloud Run is the path to a live call.</td></tr>
+      <tr><td>Is the Gemini step a real model?</td><td>No. The brief is template-written and the panel says so. It shows the format a live reasoning step would return.</td></tr>
+      <tr><td>Is the GitOps / policy content running on a cluster?</td><td>No. It is a reference design, marked “Illustrative reference”.</td></tr>
     </tbody>
   </table>
 </div>
