@@ -115,6 +115,7 @@ Multi-page React app with client-side routing (BrowserRouter in main.jsx).
 - User Guide (`static/OrcaWolfAI-UserGuide.html`, mirrored in `public/`) includes §8.1–8.3: Innovation workflow explainer, 5-minute demo script, Q&A
 - One-page demo cheat sheet: `static/OrcaWolfAI-Demo-CheatSheet.html` (mirrored in `public/`), linked from User Guide §8.2
 - Carrier Readiness cheat sheet: `static/OrcaWolfAI-Carrier-CheatSheet.html` (mirrored in `public/`), linked from User Guide §5
+- Combined two-page leave-behind: `static/OrcaWolfAI-LeaveBehind.html` (mirrored in `public/`), built from both cheat sheets; linked from User Guide §8.2
 - `/about` — Mission, principles, link to orcawolfai.com
 
 ### Components
