@@ -113,6 +113,7 @@ Multi-page React app with client-side routing (BrowserRouter in main.jsx).
 - `/simulation` — Mass Casualty Incident simulation engine (runs client-side, no data stored)
 - `/innovation` — Six research tracks as interactive workflow diagrams; each step opens a panel with analytics computed in-browser from saved runs (`src/lib/innovationData.js`, content in `src/lib/innovationGroups.jsx`)
 - User Guide (`static/OrcaWolfAI-UserGuide.html`, mirrored in `public/`) includes §8.1–8.3: Innovation workflow explainer, 5-minute demo script, Q&A
+- One-page demo cheat sheet: `static/OrcaWolfAI-Demo-CheatSheet.html` (mirrored in `public/`), linked from User Guide §8.2
 - `/about` — Mission, principles, link to orcawolfai.com
 
 ### Components
