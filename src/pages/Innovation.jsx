@@ -199,9 +199,9 @@ export default function Innovation() {
             {loading || !data ? (
               "Loading your simulation data…"
             ) : data.usingBaseline ? (
-              <>No saved simulation runs yet, so reference scenarios are shown. <Link to="/simulation" className="text-cyan-300 underline underline-offset-4">Run a simulation</Link> and every flow below updates with your own results.</>
+              <>No Mass Casualty runs are saved yet, so reference scenarios are shown{data.carriers.length > 0 ? `, alongside ${data.carriers.length} saved carrier exercise${data.carriers.length === 1 ? "" : "s"}` : ""}. <Link to="/simulation" className="text-cyan-300 underline underline-offset-4">Run a Mass Casualty simulation</Link>, then press Refresh data. Your saved runs are listed under “Recent Simulation Runs” at the bottom of that page.</>
             ) : (
-              <>Calculated live from <strong className="text-white">{data.sims.length} simulation run{data.sims.length === 1 ? "" : "s"}</strong> and <strong className="text-white">{data.carriers.length} carrier exercise{data.carriers.length === 1 ? "" : "s"}</strong> saved on this site. All figures are synthetic training data — no operational feeds, no live cloud calls.</>
+              <>Calculated live from <strong className="text-white">{data.sims.length} simulation run{data.sims.length === 1 ? "" : "s"}</strong> and <strong className="text-white">{data.carriers.length} carrier exercise{data.carriers.length === 1 ? "" : "s"}</strong> saved on this site. View them in <Link to="/simulation" className="text-cyan-300 underline underline-offset-4">Recent Simulation Runs</Link> and <Link to="/carrier" className="text-cyan-300 underline underline-offset-4">Mission History</Link>. All figures are synthetic training data — no operational feeds, no live cloud calls.</>
             )}
           </div>
           <button type="button" onClick={load} className="min-h-[40px] inline-flex items-center gap-2 px-4 rounded-md border border-cyan-400/40 text-cyan-300 text-sm hover:bg-cyan-400/10">
