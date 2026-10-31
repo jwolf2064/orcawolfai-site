@@ -12,6 +12,7 @@ import GitHub from "./pages/GitHub.jsx";
 import LoadTester from "./pages/LoadTester.jsx";
 import CarrierReadiness from "./pages/CarrierReadiness.jsx";
 import MeshC2Dashboard from "./pages/MeshC2Dashboard.jsx";
+import SavedData from "./pages/SavedData.jsx";
 import NotFound from "./pages/NotFound.jsx";
 
 export default function App() {
@@ -27,6 +28,7 @@ export default function App() {
         <Route path="/github" element={<GitHub />} />
         <Route path="/loadtest" element={<LoadTester />} />
         <Route path="/carrier-readiness" element={<CarrierReadiness />} />
+        <Route path="/saved-data" element={<SavedData />} />
         <Route path="/mesh-c2" element={<MeshC2Dashboard />} />
       </Route>
       <Route path="/admin/login" element={<AdminLogin />} />

@@ -34,6 +34,7 @@ export default function Footer() {
                 { to: "/architecture", label: "Mesh Architecture" },
                 { to: "/simulation", label: "Mass Casualty Sim" },
                 { to: "/innovation", label: "Innovation Lab" },
+                { to: "/saved-data", label: "Saved Runs & Data" },
                 { to: "/about", label: "About OrcaWolf" },
               ].map(({ to, label }) => (
                 <li key={to}>
